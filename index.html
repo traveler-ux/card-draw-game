@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>獎勵萌抽卡 - 終極史詩版</title>
+    <title>獎勵萌抽卡 - 終極史詩版 v3.0</title>
     <!-- 使用 CDN 載入必要的套件 -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- 引入 canvas-confetti 彩帶特效套件 -->
+    <!-- 引入 canvas-confetti 彩帶與金幣特效套件 -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
@@ -29,27 +29,27 @@
         @keyframes zoom-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .animate-zoom-in { animation: zoom-in 0.4s ease-out forwards; }
         @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .animate-spin-slow { animation: spin-slow 3s linear infinite; }
+        .animate-spin-slow { animation: spin-slow 8s linear infinite; }
 
         /* --- 💥 終極特效區 💥 --- */
         @keyframes hyper-shake {
             0%, 100% { transform: translate(0, 0) rotate(0) scale(1); }
-            10%, 30%, 50%, 70%, 90% { transform: translate(-4px, -4px) rotate(-2deg) scale(1.02); }
-            20%, 40%, 60%, 80% { transform: translate(4px, 4px) rotate(2deg) scale(0.98); }
+            10%, 30%, 50%, 70%, 90% { transform: translate(-5px, -5px) rotate(-3deg) scale(1.03); }
+            20%, 40%, 60%, 80% { transform: translate(5px, 5px) rotate(3deg) scale(0.97); }
         }
-        .animate-hyper-shake { animation: hyper-shake 0.1s ease-in-out infinite; }
+        .animate-hyper-shake { animation: hyper-shake 0.08s ease-in-out infinite; }
         
         @keyframes warning-pulse {
-            0%, 100% { box-shadow: inset 0 0 20px rgba(220, 38, 38, 0); background-color: rgba(220, 38, 38, 0); }
-            50% { box-shadow: inset 0 0 100px rgba(220, 38, 38, 0.4); background-color: rgba(220, 38, 38, 0.1); }
+            0%, 100% { box-shadow: inset 0 0 25px rgba(220, 38, 38, 0); background-color: rgba(220, 38, 38, 0); }
+            50% { box-shadow: inset 0 0 120px rgba(220, 38, 38, 0.5); background-color: rgba(220, 38, 38, 0.15); }
         }
-        .warning-overlay { animation: warning-pulse 0.5s infinite; pointer-events: none; }
+        .warning-overlay { animation: warning-pulse 0.4s infinite; pointer-events: none; }
 
-        .card-container { perspective: 1000px; }
+        .card-container { perspective: 1200px; }
         .card-inner {
             width: 100%; height: 100%;
             position: relative;
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-style: preserve-3d;
         }
         .card-inner.flipped { transform: rotateY(180deg); }
@@ -57,72 +57,87 @@
             position: absolute;
             width: 100%; height: 100%;
             backface-visibility: hidden;
-            border-radius: 1rem;
+            border-radius: 1.2rem;
+            overflow: hidden;
         }
         .card-back {
-            background: repeating-linear-gradient(45deg, #1e293b, #1e293b 10px, #334155 10px, #334155 20px);
+            background: repeating-linear-gradient(45deg, #1e293b, #1e293b 12px, #334155 12px, #334155 24px);
             border: 4px solid #64748b;
             display: flex; justify-content: center; align-items: center;
         }
         .card-front { transform: rotateY(180deg); }
 
+        /* ✨ 炫彩雷射閃卡 (Holographic Foil) 特效 ✨ */
+        .holo-foil {
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, 
+                rgba(255,0,0,0.2) 0%, 
+                rgba(255,154,0,0.2) 15%, 
+                rgba(208,222,33,0.2) 30%, 
+                rgba(79,220,74,0.2) 45%, 
+                rgba(63,218,216,0.2) 60%, 
+                rgba(47,201,226,0.2) 75%, 
+                rgba(28,127,238,0.2) 90%, 
+                rgba(95,21,242,0.2) 100%);
+            background-size: 300% 300%;
+            mix-blend-mode: color-dodge;
+            opacity: 0.7;
+            pointer-events: none;
+            animation: holo-shift 4s ease infinite alternate;
+        }
+        @keyframes holo-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         @keyframes flash-bang {
             0% { opacity: 1; background-color: #ffffff; }
             100% { opacity: 0; background-color: #ffffff; display: none; }
         }
-        .animate-flash-bang { animation: flash-bang 1.5s ease-out forwards; }
+        .animate-flash-bang { animation: flash-bang 1.2s ease-out forwards; }
 
         @keyframes legendary-glow {
-            0%, 100% { box-shadow: 0 0 40px #fbbf24, inset 0 0 25px #fbbf24; border-color: #fef08a; }
-            50% { box-shadow: 0 0 100px #f59e0b, inset 0 0 50px #f59e0b; border-color: #fbbf24; }
+            0%, 100% { box-shadow: 0 0 45px #fbbf24, inset 0 0 30px #fbbf24; border-color: #fef08a; }
+            50% { box-shadow: 0 0 110px #f59e0b, inset 0 0 60px #f59e0b; border-color: #ffffff; }
         }
-        .legendary-card { animation: legendary-glow 1s infinite alternate; }
+        .legendary-card { animation: legendary-glow 1.2s infinite alternate; }
 
         @keyframes epic-glow {
-            0%, 100% { box-shadow: 0 0 40px #a855f7, inset 0 0 25px #a855f7; border-color: #d8b4fe; }
-            50% { box-shadow: 0 0 100px #9333ea, inset 0 0 50px #9333ea; border-color: #a855f7; }
+            0%, 100% { box-shadow: 0 0 45px #a855f7, inset 0 0 30px #a855f7; border-color: #d8b4fe; }
+            50% { box-shadow: 0 0 100px #9333ea, inset 0 0 50px #9333ea; border-color: #ffffff; }
         }
-        .epic-card { animation: epic-glow 1s infinite alternate; }
+        .epic-card { animation: epic-glow 1.2s infinite alternate; }
 
         @keyframes rare-glow {
             0%, 100% { box-shadow: 0 0 40px #0ea5e9, inset 0 0 25px #0ea5e9; border-color: #7dd3fc; }
-            50% { box-shadow: 0 0 100px #0284c7, inset 0 0 50px #0284c7; border-color: #0ea5e9; }
+            50% { box-shadow: 0 0 90px #0284c7, inset 0 0 45px #0284c7; border-color: #38bdf8; }
         }
-        .rare-card { animation: rare-glow 1s infinite alternate; }
+        .rare-card { animation: rare-glow 1.2s infinite alternate; }
 
         .bg-rays {
-            position: absolute;
-            top: -50%; left: -50%; right: -50%; bottom: -50%;
-            background: conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.5) 20deg, transparent 40deg, rgba(255,255,255,0.5) 60deg, transparent 80deg, rgba(255,255,255,0.5) 100deg, transparent 120deg, rgba(255,255,255,0.5) 140deg, transparent 160deg, rgba(255,255,255,0.5) 180deg, transparent 200deg, rgba(255,255,255,0.5) 220deg, transparent 240deg, rgba(255,255,255,0.5) 260deg, transparent 280deg, rgba(255,255,255,0.5) 300deg, transparent 320deg, rgba(255,255,255,0.5) 340deg, transparent 360deg);
-            animation: spin-slow 8s linear infinite;
-            z-index: -1;
+            position: absolute; top: -50%; left: -50%; right: -50%; bottom: -50%;
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.6) 20deg, transparent 40deg, rgba(255,255,255,0.6) 60deg, transparent 80deg, rgba(255,255,255,0.6) 100deg, transparent 120deg, rgba(255,255,255,0.6) 140deg, transparent 160deg, rgba(255,255,255,0.6) 180deg, transparent 200deg, rgba(255,255,255,0.6) 220deg, transparent 240deg, rgba(255,255,255,0.6) 260deg, transparent 280deg, rgba(255,255,255,0.6) 300deg, transparent 320deg, rgba(255,255,255,0.6) 340deg, transparent 360deg);
+            animation: spin-slow 10s linear infinite; z-index: -1;
         }
 
-        /* 🌟 核心：圖案立體化專屬樣式區 🌟 */
         .icon-area { position: relative; }
-        
-        @keyframes icon-rays {
-            from { transform: translate(-50%, -50%) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-        .icon-rays-inner {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 140%; height: 140%; border-radius: 50%;
-            background: conic-gradient(transparent, currentColor, transparent);
-            opacity: 0.15; animation: icon-rays 4s linear infinite; z-index: -1;
-            mix-blend-mode: screen; filter: blur(3px);
-        }
-
         .exquisite-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
         .icon-shadow { opacity: 0.4; filter: blur(1.5px); color: #000; scale: 1.05; }
         .icon-neon { stroke-width: 3; filter: drop-shadow(0 0 6px currentColor); opacity: 0.9; }
-        .icon-main-stroke { stroke-width: 2.5; filter: drop-shadow(0 0 1px currentColor) }
+        .icon-main-stroke { stroke-width: 2.5; filter: drop-shadow(0 0 1px currentColor); }
 
         .legendary-card .icon-neon, .legendary-card .icon-main-stroke { color: #fef08a; }
         .epic-card .icon-neon, .epic-card .icon-main-stroke { color: #d8b4fe; }
         .rare-card .icon-neon, .rare-card .icon-main-stroke { color: #7dd3fc; }
         .common-card .icon-neon, .common-card .icon-main-stroke { color: #f1f5f9; }
 
+        @keyframes ssr-modal-bounce {
+            0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+            60% { transform: scale(1.1) rotate(3deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .animate-ssr-modal { animation: ssr-modal-bounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
     </style>
 </head>
 <body>
@@ -144,47 +159,51 @@
             legendary: 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600'
         };
 
+        // 🌟 預設卡池包含 AI 原畫圖片 🌟
         const initialItems = [
-            { name: "記得微笑", detail: "老師請記得微笑", count: 1, icon: 'Heart', color: 'bg-stone-500', rarity: 'common' },
-            { name: "命運的小禮物", detail: "由轉盤抽出小禮物", count: 5, icon: 'Gift', color: 'bg-stone-500', rarity: 'common' },
+            { name: "再抽1+1", detail: "好運連連，再抽兩張", count: 1, icon: 'Flame', color: 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600', rarity: 'legendary', image: 'images/card_legendary_flame.jpg' },
+            { name: "老師座", detail: "可坐老師的座位半天", count: 4, icon: 'Crown', color: 'bg-purple-500', rarity: 'epic', image: 'images/card_epic_crown.jpg' },
+            { name: "免死金牌", detail: "抵銷一次處罰", count: 5, icon: 'Shield-Alert', color: 'bg-purple-500', rarity: 'epic', image: 'images/card_epic_shield.jpg' },
+            { name: "點歌時間", detail: "可以在12:30前點歌在班上放", count: 15, icon: 'Music', color: 'bg-purple-500', rarity: 'epic' },
+            { name: "活動大進擊", detail: "全班增加活動時間", count: 5, icon: 'Zap', color: 'bg-purple-500', rarity: 'epic' },
             { name: "短文免寫", detail: "短文免寫二次", count: 10, icon: 'Star', color: 'bg-blue-500', rarity: 'rare' },
             { name: "免午休", detail: "獲得3天自由午休時間", count: 10, icon: 'Coffee', color: 'bg-blue-500', rarity: 'rare' },
             { name: "值日生", detail: "值日生PASS一次", count: 10, icon: 'User-Check', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "免死金牌", detail: "抵銷一次處罰", count: 5, icon: 'Shield-Alert', color: 'bg-purple-500', rarity: 'epic' },
-            { name: "點歌時間", detail: "可以在12:30前點歌在班上放", count: 15, icon: 'Music', color: 'bg-purple-500', rarity: 'epic' },
             { name: "聯絡簿讚美", detail: "獲得老師的讚美", count: 9, icon: 'Sparkles', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "老師座", detail: "可坐老師的座位半天", count: 4, icon: 'Crown', color: 'bg-purple-500', rarity: 'epic' },
-            { name: "活動大進擊", detail: "全班增加活動時間", count: 5, icon: 'Zap', color: 'bg-purple-500', rarity: 'epic' },
             { name: "三日座位", detail: "自選座位三天", count: 5, icon: 'Map-Pin', color: 'bg-blue-500', rarity: 'rare' },
             { name: "優先選擇", detail: "獲得優先選擇權", count: 10, icon: 'Chevron-Right', color: 'bg-blue-500', rarity: 'rare' },
             { name: "零食時間", detail: "獲得吃零食的自由時間", count: 10, icon: 'Cookie', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "再抽1+1", detail: "好運連連，再抽兩張", count: 1, icon: 'Flame', color: 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600', rarity: 'legendary' },
+            { name: "記得微笑", detail: "老師請記得微笑", count: 1, icon: 'Heart', color: 'bg-stone-500', rarity: 'common' },
+            { name: "命運的小禮物", detail: "由轉盤抽出小禮物", count: 5, icon: 'Gift', color: 'bg-stone-500', rarity: 'common' },
         ];
 
         function App() {
             const [view, setView] = useState('home');
+            const [soundEnabled, setSoundEnabled] = useState(true);
+            const [activeClass, setActiveClass] = useState('501班');
+            
             const [items, setItems] = useState(() => {
-                const saved = localStorage.getItem('epicRewards_items_v5');
-                // Migrate colors from old versions just in case
+                const saved = localStorage.getItem('epicRewards_items_v6');
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     return parsed.map(item => ({...item, color: rarityColorMap[item.rarity] || item.color}));
                 }
                 return initialItems;
             });
+
             const [drawCount, setDrawCount] = useState(1);
-            
             const [rollPhase, setRollPhase] = useState('idle');
             const [showFlash, setShowFlash] = useState(false);
             const [results, setResults] = useState([]);
             const [revealedIdxs, setRevealedIdxs] = useState([]);
-            
+            const [ssrModalItem, setSsrModalItem] = useState(null);
+
             const [history, setHistory] = useState(() => {
-                const saved = localStorage.getItem('epicRewards_history_v5');
+                const saved = localStorage.getItem('epicRewards_history_v6');
                 return saved ? JSON.parse(saved) : [];
             });
             const [seatNumber, setSeatNumber] = useState('');
-            const [newItem, setNewItem] = useState({ name: '', detail: '', count: 1, rarity: 'common', icon: 'Star' });
+            const [newItem, setNewItem] = useState({ name: '', detail: '', count: 1, rarity: 'common', icon: 'Star', image: '' });
 
             useEffect(() => {
                 if ('speechSynthesis' in window) {
@@ -193,10 +212,10 @@
             }, []);
 
             useEffect(() => {
-                localStorage.setItem('epicRewards_items_v5', JSON.stringify(items));
-                localStorage.setItem('epicRewards_history_v5', JSON.stringify(history));
+                localStorage.setItem('epicRewards_items_v6', JSON.stringify(items));
+                localStorage.setItem('epicRewards_history_v6', JSON.stringify(history));
                 if (window.lucide) window.lucide.createIcons();
-            }, [items, history, view, results, rollPhase, revealedIdxs]);
+            }, [items, history, view, results, rollPhase, revealedIdxs, ssrModalItem]);
 
             const totalCards = useMemo(() => items.reduce((sum, item) => sum + item.count, 0), [items]);
             const rewardPool = useMemo(() => {
@@ -207,119 +226,9 @@
                 return pool;
             }, [items]);
 
-            const speakCardRarity = (rarity) => {
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel(); 
-                    
-                    let text = "";
-                    let pitch = 0.6; 
-                    let rate = 1.0;
-                    
-                    if (rarity === 'legendary') {
-                        text = "傳說！！"; 
-                        pitch = 0.8; 
-                        rate = 0.85; 
-                    } else if (rarity === 'epic') {
-                        text = "史詩！";
-                        pitch = 0.7;
-                        rate = 1.0;
-                    }
-
-                    if (text !== "") {
-                        const utterance = new SpeechSynthesisUtterance(text);
-                        utterance.lang = 'zh-TW'; 
-                        utterance.rate = rate;     
-                        utterance.pitch = pitch;  
-                        utterance.volume = 1.0;   
-                        
-                        const voices = window.speechSynthesis.getVoices();
-                        const maleVoice = voices.find(v => 
-                            (v.lang.includes('zh') || v.lang.includes('cmn')) && 
-                            (v.name.includes('Zhiwei') || v.name.includes('Male') || v.name.includes('男') || v.name.includes('Kangkang') || v.name.includes('Yunjian'))
-                        );
-                        
-                        if (maleVoice) { utterance.voice = maleVoice; }
-                        
-                        window._currentUtterance = utterance;
-                        window.speechSynthesis.speak(utterance);
-                    }
-                }
-            };
-
-            const playCardRevealSound = (rarity) => {
-                try {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    if (!AudioContext) return;
-                    const ctx = new AudioContext();
-                    if (ctx.state === 'suspended') ctx.resume();
-                    const now = ctx.currentTime;
-                    
-                    if (rarity === 'legendary') {
-                        const bass = ctx.createOscillator();
-                        const bassGain = ctx.createGain();
-                        bass.type = 'square';
-                        bass.frequency.setValueAtTime(100, now);
-                        bass.frequency.exponentialRampToValueAtTime(10, now + 1.5);
-                        bass.connect(bassGain); bassGain.connect(ctx.destination);
-                        bassGain.gain.setValueAtTime(0, now);
-                        bassGain.gain.linearRampToValueAtTime(0.6, now + 0.05);
-                        bassGain.gain.exponentialRampToValueAtTime(0.001, now + 2.0);
-                        bass.start(now); bass.stop(now + 2.0);
-                        
-                        [440, 554, 659, 880].forEach(freq => {
-                            const osc = ctx.createOscillator();
-                            const gain = ctx.createGain();
-                            osc.type = 'sawtooth';
-                            osc.frequency.setValueAtTime(freq, now);
-                            osc.frequency.linearRampToValueAtTime(freq + 50, now + 1.0);
-                            osc.connect(gain); gain.connect(ctx.destination);
-                            gain.gain.setValueAtTime(0, now);
-                            gain.gain.linearRampToValueAtTime(0.2, now + 0.1);
-                            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
-                            osc.start(now); osc.stop(now + 1.5);
-                        });
-                        return;
-                    }
-
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    
-                    if (rarity === 'common') {
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(450, now);
-                        osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
-                        gain.gain.setValueAtTime(0, now);
-                        gain.gain.linearRampToValueAtTime(0.4, now + 0.02);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-                        osc.start(now);
-                        osc.stop(now + 0.15);
-                    } else if (rarity === 'rare') {
-                        osc.type = 'triangle';
-                        osc.frequency.setValueAtTime(700, now);
-                        osc.frequency.setValueAtTime(1000, now + 0.1);
-                        gain.gain.setValueAtTime(0, now);
-                        gain.gain.linearRampToValueAtTime(0.3, now + 0.02);
-                        gain.gain.exponentialRampToValueAtTime(0.05, now + 0.1);
-                        gain.gain.linearRampToValueAtTime(0.4, now + 0.11);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-                        osc.start(now);
-                        osc.stop(now + 0.35);
-                    } else if (rarity === 'epic') {
-                        osc.type = 'square';
-                        osc.frequency.setValueAtTime(600, now);
-                        osc.frequency.setValueAtTime(1200, now + 0.1);
-                        gain.gain.setValueAtTime(0, now);
-                        gain.gain.linearRampToValueAtTime(0.3, now + 0.02);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-                        osc.start(now);
-                        osc.stop(now + 0.55);
-                    }
-                } catch (e) { console.log("Audio skipped."); }
-            };
-
+            // 🔊 真實 Web Audio API 升級音效
             const playAudioEffects = () => {
+                if (!soundEnabled) return;
                 try {
                     const AudioContext = window.AudioContext || window.webkitAudioContext;
                     if (!AudioContext) return;
@@ -332,55 +241,115 @@
                     riserOsc.connect(riserGain); riserGain.connect(ctx.destination);
                     riserOsc.type = 'sawtooth';
                     riserOsc.frequency.setValueAtTime(50, now);
-                    riserOsc.frequency.exponentialRampToValueAtTime(1500, now + 4);
+                    riserOsc.frequency.exponentialRampToValueAtTime(1600, now + 3.8);
                     riserGain.gain.setValueAtTime(0, now);
-                    riserGain.gain.linearRampToValueAtTime(0.1, now + 0.5);
-                    riserGain.gain.exponentialRampToValueAtTime(0.001, now + 4.1);
-                    riserOsc.start(now); riserOsc.stop(now + 4.2);
+                    riserGain.gain.linearRampToValueAtTime(0.15, now + 0.5);
+                    riserGain.gain.exponentialRampToValueAtTime(0.001, now + 4);
+                    riserOsc.start(now); riserOsc.stop(now + 4.1);
 
-                    const ticks = 40;
+                    const ticks = 45;
                     for (let i = 0; i < ticks; i++) {
                         const progress = i / ticks;
-                        const timeOffset = 4 * Math.pow(progress, 1.5); 
+                        const timeOffset = 3.8 * Math.pow(progress, 1.6);
                         const osc = ctx.createOscillator();
                         const gain = ctx.createGain();
                         osc.connect(gain); gain.connect(ctx.destination);
                         osc.type = 'square';
-                        osc.frequency.setValueAtTime(400 + (progress * 800), now + timeOffset); 
+                        osc.frequency.setValueAtTime(450 + (progress * 900), now + timeOffset);
                         gain.gain.setValueAtTime(0, now + timeOffset);
-                        gain.gain.linearRampToValueAtTime(0.1, now + timeOffset + 0.01);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + timeOffset + 0.05);
-                        osc.start(now + timeOffset); osc.stop(now + timeOffset + 0.1);
+                        gain.gain.linearRampToValueAtTime(0.12, now + timeOffset + 0.01);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + timeOffset + 0.04);
+                        osc.start(now + timeOffset); osc.stop(now + timeOffset + 0.08);
                     }
-                    
-                    setTimeout(() => {
-                        const t = ctx.currentTime;
-                        const kickOsc = ctx.createOscillator();
-                        const kickGain = ctx.createGain();
-                        kickOsc.connect(kickGain); kickGain.connect(ctx.destination);
-                        kickOsc.type = 'sine';
-                        kickOsc.frequency.setValueAtTime(200, t);
-                        kickOsc.frequency.exponentialRampToValueAtTime(10, t + 0.5);
-                        kickGain.gain.setValueAtTime(0, t);
-                        kickGain.gain.linearRampToValueAtTime(0.8, t + 0.02);
-                        kickGain.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
-                        kickOsc.start(t); kickOsc.stop(t + 2);
-                    }, 4000);
-                } catch (e) { console.log("Audio skipped."); }
+                } catch (e) {}
             };
 
+            const playCardRevealSound = (rarity) => {
+                if (!soundEnabled) return;
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioContext) return;
+                    const ctx = new AudioContext();
+                    if (ctx.state === 'suspended') ctx.resume();
+                    const now = ctx.currentTime;
+
+                    if (rarity === 'legendary') {
+                        // 🎺 傳說 (SSR) 皇室登場合音
+                        [392, 523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.type = 'triangle';
+                            osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                            osc.connect(gain); gain.connect(ctx.destination);
+                            gain.gain.setValueAtTime(0, now + idx * 0.08);
+                            gain.gain.linearRampToValueAtTime(0.3, now + idx * 0.08 + 0.05);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 1.8);
+                            osc.start(now + idx * 0.08); osc.stop(now + idx * 0.08 + 2.0);
+                        });
+                        return;
+                    }
+
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain); gain.connect(ctx.destination);
+
+                    if (rarity === 'common') {
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(400, now);
+                        osc.frequency.exponentialRampToValueAtTime(180, now + 0.12);
+                        gain.gain.setValueAtTime(0, now);
+                        gain.gain.linearRampToValueAtTime(0.3, now + 0.02);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                        osc.start(now); osc.stop(now + 0.15);
+                    } else if (rarity === 'rare') {
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(587.33, now);
+                        osc.frequency.setValueAtTime(880, now + 0.08);
+                        gain.gain.setValueAtTime(0, now);
+                        gain.gain.linearRampToValueAtTime(0.35, now + 0.02);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                        osc.start(now); osc.stop(now + 0.45);
+                    } else if (rarity === 'epic') {
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(523.25, now);
+                        osc.frequency.setValueAtTime(783.99, now + 0.1);
+                        osc.frequency.setValueAtTime(1046.5, now + 0.2);
+                        gain.gain.setValueAtTime(0, now);
+                        gain.gain.linearRampToValueAtTime(0.4, now + 0.02);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                        osc.start(now); osc.stop(now + 0.65);
+                    }
+                } catch (e) {}
+            };
+
+            const speakCardRarity = (rarity) => {
+                if (!soundEnabled) return;
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    let text = rarity === 'legendary' ? "傳說！神話降臨！" : rarity === 'epic' ? "史詩獎勵！" : "";
+                    if (text !== "") {
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        utterance.lang = 'zh-TW';
+                        utterance.rate = 0.9;
+                        utterance.pitch = rarity === 'legendary' ? 0.9 : 0.8;
+                        window.speechSynthesis.speak(utterance);
+                    }
+                }
+            };
+
+            // 🎉 傳說卡大爆發：黃金金幣雨粒子
             const fireConfettiEffect = (rarity) => {
                 if (rarity === 'legendary') {
-                    const duration = 3000;
+                    const duration = 3500;
                     const end = Date.now() + duration;
                     (function frame() {
-                        confetti({ particleCount: 7, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ffbf00', '#ffd700', '#ffffff', '#ff8c00'] });
-                        confetti({ particleCount: 7, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ffbf00', '#ffd700', '#ffffff', '#ff8c00'] });
+                        confetti({ particleCount: 8, angle: 60, spread: 65, origin: { x: 0 }, colors: ['#ffd700', '#ffbf00', '#ffffff', '#ff4500'] });
+                        confetti({ particleCount: 8, angle: 120, spread: 65, origin: { x: 1 }, colors: ['#ffd700', '#ffbf00', '#ffffff', '#ff4500'] });
                         if (Date.now() < end) requestAnimationFrame(frame);
                     }());
-                    confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors: ['#ffbf00', '#ffd700', '#ffffff', '#ff0000', '#00ff00', '#0000ff'] });
+                    confetti({ particleCount: 180, spread: 110, origin: { y: 0.5 }, colors: ['#ffd700', '#ffbf00', '#ffffff', '#eab308'] });
                 } else if (rarity === 'epic') {
-                    confetti({ particleCount: 50, spread: 80, origin: { y: 0.7 }, colors: ['#a855f7', '#9333ea', '#ffffff', '#e9d5ff'] });
+                    confetti({ particleCount: 65, spread: 85, origin: { y: 0.65 }, colors: ['#a855f7', '#c084fc', '#ffffff', '#e9d5ff'] });
                 }
             };
 
@@ -401,12 +370,6 @@
             const handleDraw = () => {
                 if (rollPhase !== 'idle' || rewardPool.length === 0) return;
                 
-                if ('speechSynthesis' in window) {
-                    const warmup = new SpeechSynthesisUtterance('');
-                    warmup.volume = 0;
-                    window.speechSynthesis.speak(warmup);
-                }
-
                 const newResults = Array.from({ length: drawCount }, () => 
                     rewardPool[Math.floor(Math.random() * rewardPool.length)]
                 );
@@ -414,6 +377,7 @@
                 setRevealedIdxs([]);
                 setRollPhase('charging');
                 setShowFlash(false);
+                setSsrModalItem(null);
 
                 playAudioEffects();
 
@@ -421,21 +385,30 @@
                     setShowFlash(true);
                     setRollPhase('revealing');
                     
+                    let foundLegendary = null;
+
                     newResults.forEach((res, idx) => {
                         setTimeout(() => {
                             setRevealedIdxs(p => [...p, idx]);
                             fireConfettiEffect(res.rarity);
-                            speakCardRarity(res.rarity); 
+                            speakCardRarity(res.rarity);
                             playCardRevealSound(res.rarity);
-                        }, idx * 700); 
+
+                            if (res.rarity === 'legendary') {
+                                foundLegendary = res;
+                            }
+                        }, idx * 700);
                     });
                     
                     setTimeout(() => {
                         setRollPhase('idle');
                         setShowFlash(false);
-                        setHistory(p => [{ seat: seatNumber, count: drawCount, items: newResults, time: new Date().toLocaleTimeString() }, ...p].slice(0, 50));
-                    }, newResults.length * 700 + 1500);
-                }, 4000);
+                        if (foundLegendary) {
+                            setSsrModalItem(foundLegendary);
+                        }
+                        setHistory(p => [{ seat: seatNumber, count: drawCount, items: newResults, time: new Date().toLocaleTimeString(), class: activeClass }, ...p].slice(0, 50));
+                    }, newResults.length * 700 + 1200);
+                }, 3800);
             };
 
             const updateItemCount = (idx, val) => {
@@ -444,11 +417,10 @@
                 setItems(newItems);
             };
 
-            // 🌟 新增：手動更新階級並同時替換顏色的功能 🌟
             const updateItemRarity = (idx, newRarity) => {
                 const newItems = [...items];
                 newItems[idx].rarity = newRarity;
-                newItems[idx].color = rarityColorMap[newRarity]; // 自動套用對應階級的顏色
+                newItems[idx].color = rarityColorMap[newRarity];
                 setItems(newItems);
             };
 
@@ -459,7 +431,36 @@
                 }
                 const itemToAdd = { ...newItem, color: rarityColorMap[newItem.rarity], count: Math.max(0, parseInt(newItem.count) || 1) };
                 setItems([...items, itemToAdd]);
-                setNewItem({ name: '', detail: '', count: 1, rarity: 'common', icon: 'Star' }); 
+                setNewItem({ name: '', detail: '', count: 1, rarity: 'common', icon: 'Star', image: '' });
+            };
+
+            // 📥 匯出卡池 JSON 檔
+            const exportConfigJSON = () => {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ class: activeClass, items }, null, 2));
+                const dlAnchor = document.createElement('a');
+                dlAnchor.setAttribute("href", dataStr);
+                dlAnchor.setAttribute("download", `獎勵卡池_${activeClass}_${new Date().toISOString().slice(0,10)}.json`);
+                document.body.appendChild(dlAnchor);
+                dlAnchor.click();
+                dlAnchor.remove();
+            };
+
+            // 📤 匯入卡池 JSON 檔
+            const importConfigJSON = (e) => {
+                const fileReader = new FileReader();
+                if (e.target.files[0]) {
+                    fileReader.readAsText(e.target.files[0], "UTF-8");
+                    fileReader.onload = (event) => {
+                        try {
+                            const parsed = JSON.parse(event.target.result);
+                            if (Array.isArray(parsed.items)) {
+                                setItems(parsed.items);
+                                if (parsed.class) setActiveClass(parsed.class);
+                                alert('✅ 卡池 JSON 設定已成功匯入！');
+                            } else { alert('❌ JSON 格式錯誤！'); }
+                        } catch (err) { alert('❌ 讀取 JSON 檔案失敗！'); }
+                    };
+                }
             };
 
             const bgColor = view === 'draw' ? 'bg-black' : 'bg-[#FFF9F2]';
@@ -478,12 +479,45 @@
                     {rollPhase === 'charging' && <div className="fixed inset-0 z-0 warning-overlay"></div>}
                     {showFlash && <div className="fixed inset-0 z-[100] pointer-events-none animate-flash-bang"></div>}
 
+                    {/* 🌟 傳說 SSR 全螢幕大爆發模態框 🌟 */}
+                    {ssrModalItem && (
+                        <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-lg flex items-center justify-center p-4">
+                            <div className="bg-gradient-to-b from-yellow-500 via-amber-600 to-red-700 p-1 rounded-3xl animate-ssr-modal max-w-sm w-full shadow-[0_0_80px_rgba(250,204,21,0.8)] border-4 border-yellow-300 relative text-center text-white">
+                                <div className="bg-slate-900 rounded-[22px] p-6 relative overflow-hidden">
+                                    <div className="bg-rays"></div>
+                                    <div className="text-yellow-400 font-black text-2xl tracking-wider mb-2 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]">🌟 傳說降臨 (SSR) 🌟</div>
+                                    
+                                    {ssrModalItem.image ? (
+                                        <img src={ssrModalItem.image} alt={ssrModalItem.name} className="w-36 h-36 rounded-2xl mx-auto my-3 object-cover border-4 border-yellow-400 shadow-2xl" />
+                                    ) : (
+                                        <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-red-600 rounded-2xl mx-auto my-3 flex items-center justify-center shadow-2xl border-2 border-yellow-200">
+                                            <ExquisiteIcon name={ssrModalItem.icon} className="w-12 h-12 legendary-card" />
+                                        </div>
+                                    )}
+
+                                    <h3 className="text-3xl font-black text-yellow-300 drop-shadow-md mb-2">{ssrModalItem.name}</h3>
+                                    <p className="text-slate-200 font-bold text-sm bg-black/40 p-2 rounded-xl border border-yellow-500/30 mb-4">{ssrModalItem.detail}</p>
+                                    
+                                    <button onClick={()=>setSsrModalItem(null)} className="w-full py-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950 font-black text-xl rounded-xl shadow-lg hover:scale-105 transition-transform">
+                                        收下神話獎勵 ✨
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     <nav className={`${view==='draw'?'bg-black/60 border-slate-800':'bg-white/80 border-orange-100'} backdrop-blur-md shrink-0 sticky top-0 z-50 px-4 md:px-6 py-3 flex justify-between items-center shadow-sm border-b transition-colors duration-1000`}>
                         <div className="flex items-center gap-2 cursor-pointer" onClick={() => setView('home')}>
                             <div className="bg-red-600 p-1.5 md:p-2 rounded-xl text-white shadow-[0_0_15px_rgba(220,38,38,0.8)]"><Icon name="Zap" className="w-5 h-5 md:w-6 md:h-6" /></div>
-                            <span className={`text-lg md:text-xl font-black tracking-tight ${view==='draw'?'text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.8)]':'text-orange-600'}`}>終極抽卡陣</span>
+                            <span className={`text-lg md:text-xl font-black tracking-tight ${view==='draw'?'text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.8)]':'text-orange-600'}`}>終極抽卡陣 v3.0</span>
                         </div>
-                        <div className="flex gap-1 md:gap-4">
+                        
+                        <div className="flex items-center gap-1 md:gap-3">
+                            <button onClick={()=>setSoundEnabled(!soundEnabled)} className={`px-3 py-1.5 rounded-full text-xs md:text-sm font-bold flex items-center gap-1 transition-all ${soundEnabled?'bg-green-100 text-green-700':'bg-slate-200 text-slate-500'}`}>
+                                <Icon name={soundEnabled?"Volume2":"VolumeX"} className="w-4 h-4" />
+                                <span className="hidden sm:inline">{soundEnabled?"音效 ON":"音效 OFF"}</span>
+                            </button>
+
                             <button onClick={() => setView('home')} className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-full font-bold transition-all ${view==='home'?'bg-orange-100 text-orange-600':view==='draw'?'text-slate-400 hover:text-white':'text-slate-500 hover:bg-slate-100'}`}>
                                 <Icon name="Home" className="w-4 h-4 md:w-5 md:h-5" />
                                 <span className="text-sm md:text-base hidden sm:inline">首頁</span>
@@ -505,6 +539,7 @@
                             <div className="animate-slide-up flex flex-col h-full justify-between pb-2">
                                 <div>
                                     <div className="text-center mb-4 md:mb-6">
+                                        <div className="inline-block bg-orange-100 text-orange-700 font-bold px-3 py-1 rounded-full text-xs mb-2">當前班級：{activeClass}</div>
                                         <h2 className="text-2xl md:text-3xl font-black mb-1">傳說獎勵卡池</h2>
                                         <p className="text-slate-500 text-sm md:text-base font-bold">目前卡池深度：{totalCards} 張</p>
                                     </div>
@@ -512,9 +547,15 @@
                                         {items.map((item, idx) => (
                                             <div key={idx} className={`bg-white p-2 md:p-3 rounded-2xl shadow-sm border-b-4 border-slate-200 hover:scale-105 hover:shadow-xl transition-all flex flex-col items-center justify-center text-center relative overflow-hidden ${item.rarity==='legendary'?'border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]':''}`}>
                                                 {item.rarity === 'legendary' && <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[9px] font-black px-1.5 py-0.5 rounded-bl-lg">傳說</div>}
-                                                <div className={`${item.color} w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-white mb-2 shrink-0 shadow-md`}>
-                                                    <ExquisiteIcon name={item.icon} className={`w-5 h-5 md:w-6 md:h-6 ${item.rarity === 'legendary' ? 'legendary-card' : item.rarity === 'epic' ? 'epic-card' : item.rarity === 'rare' ? 'rare-card' : 'common-card'}`} />
-                                                </div>
+                                                
+                                                {item.image ? (
+                                                    <img src={item.image} alt={item.name} className="w-10 h-10 md:w-12 md:h-12 rounded-xl object-cover mb-2 shadow-md border border-amber-300 shrink-0" />
+                                                ) : (
+                                                    <div className={`${item.color} w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-white mb-2 shrink-0 shadow-md`}>
+                                                        <ExquisiteIcon name={item.icon} className={`w-5 h-5 md:w-6 md:h-6 ${item.rarity === 'legendary' ? 'legendary-card' : item.rarity === 'epic' ? 'epic-card' : item.rarity === 'rare' ? 'rare-card' : 'common-card'}`} />
+                                                    </div>
+                                                )}
+
                                                 <h3 className="font-bold text-xs md:text-sm leading-tight mb-1">{item.name}</h3>
                                                 <div className="flex justify-between w-full mt-auto text-[10px] text-slate-500 font-bold">
                                                     <span>{item.count} 張</span>
@@ -552,7 +593,7 @@
                                 <div className={`flex-1 flex flex-col p-3 md:p-6 rounded-[30px] shadow-2xl relative overflow-hidden transition-all duration-300 ${rollPhase === 'charging' ? 'bg-slate-900 border-2 border-red-600 shadow-[0_0_60px_rgba(220,38,38,0.6)]' : 'bg-slate-800 border-2 border-slate-700'}`}>
                                     
                                     <div className="flex justify-between items-center mb-2 px-2 opacity-60">
-                                        <span className="text-white font-bold tracking-widest text-sm">勇者座號：{seatNumber}</span>
+                                        <span className="text-white font-bold tracking-widest text-sm">勇者座號：{seatNumber} ({activeClass})</span>
                                         <span className="text-white font-bold tracking-widest text-sm">抽取數量：{drawCount}</span>
                                     </div>
 
@@ -571,7 +612,7 @@
                                                 const glowClass = res.rarity === 'legendary' ? 'legendary-card' : res.rarity === 'epic' ? 'epic-card' : res.rarity === 'rare' ? 'rare-card' : 'common-card';
 
                                                 return (
-                                                    <div key={i} className={`card-container w-28 h-40 sm:w-32 sm:h-48 md:w-44 md:h-64 transition-all duration-300 ${rollPhase==='charging'?'animate-hyper-shake':''}`}>
+                                                    <div key={i} className={`card-container w-28 h-40 sm:w-32 sm:h-48 md:w-44 md:h-64 transition-all duration-300 hover:scale-105 ${rollPhase==='charging'?'animate-hyper-shake':''}`}>
                                                         <div className={`card-inner ${isFlipped ? 'flipped' : ''}`}>
                                                             
                                                             <div className="card-back shadow-[0_0_20px_rgba(0,0,0,0.8)]">
@@ -581,19 +622,25 @@
                                                                 {rollPhase === 'charging' && <div className="absolute inset-0 bg-red-500/10 mix-blend-color-burn animate-pulse"></div>}
                                                             </div>
                                                             
-                                                            <div className={`card-front bg-slate-800 flex items-center justify-center overflow-hidden border-4 ${glowClass}`}>
+                                                            <div className={`card-front bg-slate-800 flex items-center justify-center overflow-hidden border-4 ${glowClass} relative`}>
+                                                                {/* ✨ 雷射閃卡疊加層 ✨ */}
+                                                                {(res.rarity === 'legendary' || res.rarity === 'epic') && <div className="holo-foil"></div>}
+
                                                                 <div className="absolute inset-[-50%] overflow-hidden rounded-full mix-blend-screen opacity-30 z-0 pointer-events-none"><div className="bg-rays"></div></div>
                                                                 
-                                                                <div className={`relative z-10 w-full h-full flex flex-col items-center justify-center p-2 text-center ${res.color} text-white m-1 rounded-lg ${res.rarity === 'legendary' ? 'border-2 border-yellow-200' : res.rarity === 'epic' ? 'border-2 border-purple-200' : res.rarity === 'rare' ? 'border-2 border-cyan-200' : ''}`}>
+                                                                <div className={`relative z-10 w-full h-full flex flex-col items-center justify-between p-2 text-center ${res.color} text-white m-1 rounded-lg ${res.rarity === 'legendary' ? 'border-2 border-yellow-200' : res.rarity === 'epic' ? 'border-2 border-purple-200' : res.rarity === 'rare' ? 'border-2 border-cyan-200' : ''}`}>
                                                                     
-                                                                    <div className="icon-area relative p-2 md:p-4 rounded-full mb-1 md:mb-3 shadow-inner border-2 border-white/10 shrink-0">
-                                                                        <div className="icon-rays-inner"></div>
-                                                                        <ExquisiteIcon name={res.icon} className="w-6 h-6 md:w-12 md:h-12" />
-                                                                    </div>
+                                                                    {res.image ? (
+                                                                        <img src={res.image} alt={res.name} className="w-full h-24 sm:h-32 object-cover rounded-md shadow-lg my-1 border border-white/20" />
+                                                                    ) : (
+                                                                        <div className="icon-area relative p-2 md:p-3 rounded-full my-1 shadow-inner border-2 border-white/10 shrink-0">
+                                                                            <ExquisiteIcon name={res.icon} className="w-6 h-6 md:w-10 md:h-10" />
+                                                                        </div>
+                                                                    )}
 
                                                                     <div className="font-black text-base sm:text-lg md:text-xl tracking-wider drop-shadow-md leading-tight mb-0.5 w-full line-clamp-1 px-0.5">{res.name}</div>
                                                                     
-                                                                    <div className="text-[9px] sm:text-[10px] md:text-xs mt-0.5 md:mt-1 opacity-95 font-bold bg-black/30 px-1.5 py-1 md:py-1.5 rounded w-full line-clamp-2 md:line-clamp-3 leading-snug">{res.detail}</div>
+                                                                    <div className="text-[9px] sm:text-[10px] md:text-xs opacity-95 font-bold bg-black/40 px-1.5 py-1 rounded w-full line-clamp-2 leading-snug">{res.detail}</div>
                                                                 </div>
                                                             </div>
 
@@ -620,16 +667,27 @@
                         {view === 'admin' && (
                             <div className="space-y-6 animate-slide-up pb-10">
                                 <div className="bg-white p-4 md:p-6 rounded-3xl flex flex-col md:flex-row gap-4 justify-between md:items-center shadow-sm">
-                                    <div><h3 className="font-black text-xl text-slate-800">系統管理</h3></div>
-                                    <div className="flex gap-2">
-                                        <button onClick={()=>{if(confirm('警告：確定要重設為預設獎項？'))setItems(initialItems)}} className="bg-slate-200 px-4 py-2 rounded-xl font-bold hover:bg-slate-300 transition-colors flex-1 md:flex-none text-center text-slate-700">恢復預設</button>
-                                        <button onClick={()=>setHistory([])} className="bg-red-500 text-white px-4 py-2 rounded-xl font-bold hover:bg-red-600 transition-colors shadow-md flex-1 md:flex-none text-center">清除紀錄</button>
+                                    <div>
+                                        <h3 className="font-black text-xl text-slate-800">系統管理</h3>
+                                        <p className="text-xs text-slate-500 font-bold mt-1">切換班級與匯出/匯入卡池配置</p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['501班', '502班', '503班'].map(cls => (
+                                            <button key={cls} onClick={()=>setActiveClass(cls)} className={`px-3 py-1.5 rounded-xl font-bold text-sm transition-all ${activeClass===cls?'bg-orange-500 text-white shadow-md':'bg-orange-50 text-orange-600'}`}>{cls}</button>
+                                        ))}
+                                        <button onClick={exportConfigJSON} className="bg-blue-500 text-white px-3 py-1.5 rounded-xl font-bold text-sm hover:bg-blue-600 transition-colors shadow-sm">📥 匯出 JSON</button>
+                                        <label className="bg-purple-500 text-white px-3 py-1.5 rounded-xl font-bold text-sm hover:bg-purple-600 transition-colors shadow-sm cursor-pointer">
+                                            📤 匯入 JSON
+                                            <input type="file" accept=".json" onChange={importConfigJSON} className="hidden" />
+                                        </label>
+                                        <button onClick={()=>{if(confirm('警告：確定要重設為預設獎項？'))setItems(initialItems)}} className="bg-slate-200 px-3 py-1.5 rounded-xl font-bold text-sm hover:bg-slate-300 transition-colors text-slate-700">恢復預設</button>
+                                        <button onClick={()=>setHistory([])} className="bg-red-500 text-white px-3 py-1.5 rounded-xl font-bold text-sm hover:bg-red-600 transition-colors shadow-sm">清除紀錄</button>
                                     </div>
                                 </div>
 
                                 <div className="bg-white p-4 md:p-6 rounded-3xl shadow-sm border border-slate-200 border-l-8 border-l-green-400 relative overflow-hidden">
                                     <h4 className="font-bold flex items-center gap-2 text-lg text-slate-800 mb-4">
-                                        <Icon name="PlusCircle" className="text-green-500" /> 新增自訂獎項
+                                        <Icon name="PlusCircle" className="text-green-500" /> 新增自訂獎項 (支援 AI 原畫網址)
                                     </h4>
                                     <div className="grid grid-cols-1 md:grid-cols-5 gap-3 md:gap-4 items-end relative z-10">
                                         <div className="md:col-span-1">
@@ -641,8 +699,8 @@
                                             <input type="text" value={newItem.detail} onChange={e=>setNewItem({...newItem, detail: e.target.value})} className="w-full border-2 border-slate-200 rounded-xl px-3 py-2 font-bold text-slate-700 outline-none focus:border-green-400 transition-colors" placeholder="例：可免寫一半作業" />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-bold text-slate-600 mb-1">放入數量</label>
-                                            <input type="number" value={newItem.count} onChange={e=>setNewItem({...newItem, count: e.target.value})} className="w-full border-2 border-slate-200 rounded-xl px-3 py-2 font-bold text-slate-700 outline-none focus:border-green-400 transition-colors" min="1" />
+                                            <label className="block text-sm font-bold text-slate-600 mb-1">圖片網址 (選填)</label>
+                                            <input type="text" value={newItem.image} onChange={e=>setNewItem({...newItem, image: e.target.value})} className="w-full border-2 border-slate-200 rounded-xl px-3 py-2 font-bold text-slate-700 outline-none focus:border-green-400 transition-colors" placeholder="例：images/my_card.jpg" />
                                         </div>
                                         <div>
                                             <label className="block text-sm font-bold text-slate-600 mb-1">稀有等級</label>
@@ -687,12 +745,15 @@
                                                 {items.map((item, idx) => (
                                                     <tr key={idx} className="hover:bg-slate-50 transition-colors">
                                                         <td className="px-6 py-4 font-bold flex items-center gap-3">
-                                                            <div className={`${item.color} w-10 h-10 rounded-xl flex shrink-0 items-center justify-center text-white shadow-md relative overflow-hidden transition-colors duration-300`}>
-                                                                <ExquisiteIcon name={item.icon} className={`w-5 h-5 ${item.rarity === 'legendary' ? 'legendary-card' : item.rarity === 'epic' ? 'epic-card' : item.rarity === 'rare' ? 'rare-card' : 'common-card'}`} />
-                                                            </div>
+                                                            {item.image ? (
+                                                                <img src={item.image} alt={item.name} className="w-10 h-10 rounded-xl object-cover shadow-md border border-amber-300 shrink-0" />
+                                                            ) : (
+                                                                <div className={`${item.color} w-10 h-10 rounded-xl flex shrink-0 items-center justify-center text-white shadow-md relative overflow-hidden transition-colors duration-300`}>
+                                                                    <ExquisiteIcon name={item.icon} className={`w-5 h-5 ${item.rarity === 'legendary' ? 'legendary-card' : item.rarity === 'epic' ? 'epic-card' : item.rarity === 'rare' ? 'rare-card' : 'common-card'}`} />
+                                                                </div>
+                                                            )}
                                                             <span className="text-lg text-slate-800 line-clamp-1">{item.name}</span>
                                                         </td>
-                                                        {/* 🌟 新增的階級選擇器 🌟 */}
                                                         <td className="px-6 py-4">
                                                             <select 
                                                                 value={item.rarity} 
@@ -735,7 +796,7 @@
                                                 <thead className="bg-slate-50">
                                                     <tr>
                                                         <th className="px-6 py-3 text-slate-600 font-bold w-1/5">時間</th>
-                                                        <th className="px-6 py-3 text-slate-600 font-bold w-1/5">勇者座號</th>
+                                                        <th className="px-6 py-3 text-slate-600 font-bold w-1/5">勇者座號 (班級)</th>
                                                         <th className="px-6 py-3 text-slate-600 font-bold w-1/5">花費點數</th>
                                                         <th className="px-6 py-3 text-slate-600 font-bold">獲得獎項</th>
                                                     </tr>
@@ -745,7 +806,7 @@
                                                         <tr key={idx} className="hover:bg-slate-50 transition-colors">
                                                             <td className="px-6 py-4 text-slate-500 font-bold">{record.time}</td>
                                                             <td className="px-6 py-4 font-black text-lg text-slate-800">
-                                                                <span className="bg-slate-200 px-3 py-1 rounded-lg">{record.seat}</span>
+                                                                <span className="bg-slate-200 px-3 py-1 rounded-lg">{record.seat}號 ({record.class||'501班'})</span>
                                                             </td>
                                                             <td className="px-6 py-4 font-black text-lg text-orange-500">
                                                                 {record.count * 10} 點
