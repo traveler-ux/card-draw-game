@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>獎勵萌抽卡 - 終極史詩版 v3.0</title>
+    <title>獎勵萌抽卡 - 終極史詩版 v3.1</title>
     <!-- 使用 CDN 載入必要的套件 -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -62,8 +62,9 @@
         }
         .card-back {
             background: repeating-linear-gradient(45deg, #1e293b, #1e293b 12px, #334155 12px, #334155 24px);
-            border: 4px solid #64748b;
+            border: 4px solid #f59e0b;
             display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
         }
         .card-front { transform: rotateY(180deg); }
 
@@ -150,7 +151,14 @@
             return <i data-lucide={name.toLowerCase()} className={className}></i>;
         };
 
-        const availableIcons = ['Star', 'Gift', 'Heart', 'Zap', 'Crown', 'Shield-Alert', 'Coffee', 'Music', 'Sparkles', 'Map-Pin', 'Cookie', 'Flame', 'Thumbs-Up', 'Smile', 'Sun', 'Moon', 'Book', 'User-Check', 'Chevron-Right', 'Plus', 'PlusCircle', 'History'];
+        // 🎨 豐富可愛的選擇圖示清單 🎨
+        const availableIcons = [
+            'Star', 'Gift', 'Heart', 'Zap', 'Crown', 'Shield-Alert', 
+            'Coffee', 'Music', 'Sparkles', 'Map-Pin', 'Cookie', 'Flame', 
+            'Thumbs-Up', 'Smile', 'Sun', 'Moon', 'Book', 'User-Check', 
+            'Trophy', 'Medal', 'Award', 'Palette', 'PartyPopper', 'Utensils',
+            'Check-Circle2', 'Flame', 'Sparkle', 'Chevron-Right'
+        ];
 
         const rarityColorMap = {
             common: 'bg-stone-500',
@@ -159,28 +167,28 @@
             legendary: 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600'
         };
 
-        // 🌟 預設卡池包含 AI 原畫圖片 🌟
+        // 🌟 預設卡池包含 AI 原畫圖片與可愛圖示對應 🌟
         const initialItems = [
             { name: "再抽1+1", detail: "好運連連，再抽兩張", count: 1, icon: 'Flame', color: 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600', rarity: 'legendary', image: 'images/card_legendary_flame.jpg' },
             { name: "老師座", detail: "可坐老師的座位半天", count: 4, icon: 'Crown', color: 'bg-purple-500', rarity: 'epic', image: 'images/card_epic_crown.jpg' },
             { name: "免死金牌", detail: "抵銷一次處罰", count: 5, icon: 'Shield-Alert', color: 'bg-purple-500', rarity: 'epic', image: 'images/card_epic_shield.jpg' },
             { name: "點歌時間", detail: "可以在12:30前點歌在班上放", count: 15, icon: 'Music', color: 'bg-purple-500', rarity: 'epic' },
             { name: "活動大進擊", detail: "全班增加活動時間", count: 5, icon: 'Zap', color: 'bg-purple-500', rarity: 'epic' },
-            { name: "短文免寫", detail: "短文免寫二次", count: 10, icon: 'Star', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "免午休", detail: "獲得3天自由午休時間", count: 10, icon: 'Coffee', color: 'bg-blue-500', rarity: 'rare' },
+            { name: "短文免寫", detail: "短文免寫二次", count: 10, icon: 'Book', color: 'bg-blue-500', rarity: 'rare' },
+            { name: "免午休", detail: "獲得3天自由午休時間", count: 10, icon: 'Sun', color: 'bg-blue-500', rarity: 'rare' },
             { name: "值日生", detail: "值日生PASS一次", count: 10, icon: 'User-Check', color: 'bg-blue-500', rarity: 'rare' },
             { name: "聯絡簿讚美", detail: "獲得老師的讚美", count: 9, icon: 'Sparkles', color: 'bg-blue-500', rarity: 'rare' },
             { name: "三日座位", detail: "自選座位三天", count: 5, icon: 'Map-Pin', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "優先選擇", detail: "獲得優先選擇權", count: 10, icon: 'Chevron-Right', color: 'bg-blue-500', rarity: 'rare' },
+            { name: "優先選擇", detail: "獲得優先選擇權", count: 10, icon: 'Award', color: 'bg-blue-500', rarity: 'rare' },
             { name: "零食時間", detail: "獲得吃零食的自由時間", count: 10, icon: 'Cookie', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "記得微笑", detail: "老師請記得微笑", count: 1, icon: 'Heart', color: 'bg-stone-500', rarity: 'common' },
+            { name: "記得微笑", detail: "老師請記得微笑", count: 1, icon: 'Smile', color: 'bg-stone-500', rarity: 'common' },
             { name: "命運的小禮物", detail: "由轉盤抽出小禮物", count: 5, icon: 'Gift', color: 'bg-stone-500', rarity: 'common' },
         ];
 
         function App() {
             const [view, setView] = useState('home');
             const [soundEnabled, setSoundEnabled] = useState(true);
-            const [activeClass, setActiveClass] = useState('501班');
+            const [iconPickerIdx, setIconPickerIdx] = useState(null); // 控制 Icon 選擇器彈窗
             
             const [items, setItems] = useState(() => {
                 const saved = localStorage.getItem('epicRewards_items_v6') || localStorage.getItem('epicRewards_items_v5');
@@ -191,6 +199,7 @@
                             const match = initialItems.find(i => i.name === item.name);
                             return {
                                 ...item,
+                                icon: item.icon || (match ? match.icon : 'Star'),
                                 image: item.image || (match ? match.image : undefined),
                                 color: rarityColorMap[item.rarity] || item.color
                             };
@@ -224,7 +233,7 @@
                 localStorage.setItem('epicRewards_items_v6', JSON.stringify(items));
                 localStorage.setItem('epicRewards_history_v6', JSON.stringify(history));
                 if (window.lucide) window.lucide.createIcons();
-            }, [items, history, view, results, rollPhase, revealedIdxs, ssrModalItem]);
+            }, [items, history, view, results, rollPhase, revealedIdxs, ssrModalItem, iconPickerIdx]);
 
             const totalCards = useMemo(() => items.reduce((sum, item) => sum + item.count, 0), [items]);
             const rewardPool = useMemo(() => {
@@ -283,7 +292,6 @@
                     const now = ctx.currentTime;
 
                     if (rarity === 'legendary') {
-                        // 🎺 傳說 (SSR) 皇室登場合音
                         [392, 523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
                             const osc = ctx.createOscillator();
                             const gain = ctx.createGain();
@@ -346,7 +354,6 @@
                 }
             };
 
-            // 🎉 傳說卡大爆發：黃金金幣雨粒子
             const fireConfettiEffect = (rarity) => {
                 if (rarity === 'legendary') {
                     const duration = 3500;
@@ -415,7 +422,7 @@
                         if (foundLegendary) {
                             setSsrModalItem(foundLegendary);
                         }
-                        setHistory(p => [{ seat: seatNumber, count: drawCount, items: newResults, time: new Date().toLocaleTimeString(), class: activeClass }, ...p].slice(0, 50));
+                        setHistory(p => [{ seat: seatNumber, count: drawCount, items: newResults, time: new Date().toLocaleTimeString() }, ...p].slice(0, 50));
                     }, newResults.length * 700 + 1200);
                 }, 3800);
             };
@@ -433,6 +440,12 @@
                 setItems(newItems);
             };
 
+            const updateItemIcon = (idx, newIcon) => {
+                const newItems = [...items];
+                newItems[idx].icon = newIcon;
+                setItems(newItems);
+            };
+
             const handleAddNewItem = () => {
                 if (!newItem.name.trim()) {
                     alert('請輸入獎項名稱！');
@@ -445,10 +458,10 @@
 
             // 📥 匯出卡池 JSON 檔
             const exportConfigJSON = () => {
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ class: activeClass, items }, null, 2));
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ items }, null, 2));
                 const dlAnchor = document.createElement('a');
                 dlAnchor.setAttribute("href", dataStr);
-                dlAnchor.setAttribute("download", `獎勵卡池_${activeClass}_${new Date().toISOString().slice(0,10)}.json`);
+                dlAnchor.setAttribute("download", `獎勵卡池_${new Date().toISOString().slice(0,10)}.json`);
                 document.body.appendChild(dlAnchor);
                 dlAnchor.click();
                 dlAnchor.remove();
@@ -464,7 +477,6 @@
                             const parsed = JSON.parse(event.target.result);
                             if (Array.isArray(parsed.items)) {
                                 setItems(parsed.items);
-                                if (parsed.class) setActiveClass(parsed.class);
                                 alert('✅ 卡池 JSON 設定已成功匯入！');
                             } else { alert('❌ JSON 格式錯誤！'); }
                         } catch (err) { alert('❌ 讀取 JSON 檔案失敗！'); }
@@ -472,25 +484,62 @@
                 }
             };
 
-            const bgColor = view === 'draw' ? 'bg-black' : 'bg-[#FFF9F2]';
+            // 🌟 風格統一：全站一致的溫暖暖調背景與魔幻星空質感 🌟
+            const mainBgClass = view === 'draw' 
+                ? 'bg-gradient-to-b from-slate-950 via-slate-900 to-amber-950/40 text-white' 
+                : 'bg-[#FFF9F2] text-slate-800';
 
             const ExquisiteIcon = ({ name, className = "" }) => (
                 <div className={`relative ${className}`}>
-                    <Icon name={name} className="exquisite-icon icon-shadow w-full h-full text-black" />
-                    <Icon name={name} className="exquisite-icon icon-neon w-full h-full" />
-                    <Icon name={name} className="exquisite-icon icon-main-stroke w-full h-full" />
+                    <Icon name={name || 'Star'} className="exquisite-icon icon-shadow w-full h-full text-black" />
+                    <Icon name={name || 'Star'} className="exquisite-icon icon-neon w-full h-full" />
+                    <Icon name={name || 'Star'} className="exquisite-icon icon-main-stroke w-full h-full" />
                 </div>
             );
 
             return (
-                <div className={`h-screen flex flex-col overflow-hidden transition-colors duration-1000 relative ${bgColor}`}>
+                <div className={`h-screen flex flex-col overflow-hidden transition-colors duration-1000 relative ${mainBgClass}`}>
                     
                     {rollPhase === 'charging' && <div className="fixed inset-0 z-0 warning-overlay"></div>}
                     {showFlash && <div className="fixed inset-0 z-[100] pointer-events-none animate-flash-bang"></div>}
 
+                    {/* 🎨 圖示可視化選擇器彈窗 (Icon Picker Modal) 🎨 */}
+                    {iconPickerIdx !== null && (
+                        <div className="fixed inset-0 z-[300] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+                            <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border-2 border-orange-200 animate-zoom-in">
+                                <div className="flex justify-between items-center mb-4 border-b pb-3">
+                                    <h3 className="text-xl font-black text-slate-800 flex items-center gap-2">
+                                        <Icon name="Palette" className="text-orange-500" /> 選擇可愛圖示
+                                    </h3>
+                                    <button onClick={()=>setIconPickerIdx(null)} className="text-slate-400 hover:text-slate-600 font-black text-xl">✕</button>
+                                </div>
+
+                                <div className="grid grid-cols-6 gap-3 max-h-72 overflow-y-auto custom-scrollbar p-2">
+                                    {availableIcons.map(ic => (
+                                        <button 
+                                            key={ic} 
+                                            onClick={() => {
+                                                if (iconPickerIdx === 'newItem') {
+                                                    setNewItem({...newItem, icon: ic});
+                                                } else {
+                                                    updateItemIcon(iconPickerIdx, ic);
+                                                }
+                                                setIconPickerIdx(null);
+                                            }}
+                                            className="p-3 bg-orange-50 hover:bg-orange-500 hover:text-white rounded-2xl flex flex-col items-center justify-center transition-all hover:scale-110 shadow-sm text-slate-700"
+                                        >
+                                            <Icon name={ic} className="w-6 h-6 mb-1" />
+                                            <span className="text-[10px] font-bold truncate w-full text-center">{ic}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* 🌟 傳說 SSR 全螢幕大爆發模態框 🌟 */}
                     {ssrModalItem && (
-                        <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-lg flex items-center justify-center p-4">
+                        <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-lg flex items-center justify-center p-4">
                             <div className="bg-gradient-to-b from-yellow-500 via-amber-600 to-red-700 p-1 rounded-3xl animate-ssr-modal max-w-sm w-full shadow-[0_0_80px_rgba(250,204,21,0.8)] border-4 border-yellow-300 relative text-center text-white">
                                 <div className="bg-slate-900 rounded-[22px] p-6 relative overflow-hidden">
                                     <div className="bg-rays"></div>
@@ -515,27 +564,28 @@
                         </div>
                     )}
 
-                    <nav className={`${view==='draw'?'bg-black/60 border-slate-800':'bg-white/80 border-orange-100'} backdrop-blur-md shrink-0 sticky top-0 z-50 px-4 md:px-6 py-3 flex justify-between items-center shadow-sm border-b transition-colors duration-1000`}>
+                    {/* 🌟 導覽列：全站一致風格 🌟 */}
+                    <nav className={`${view==='draw'?'bg-slate-900/80 border-slate-800':'bg-white/80 border-orange-100'} backdrop-blur-md shrink-0 sticky top-0 z-50 px-4 md:px-6 py-3 flex justify-between items-center shadow-sm border-b transition-colors duration-1000`}>
                         <div className="flex items-center gap-2 cursor-pointer" onClick={() => setView('home')}>
-                            <div className="bg-red-600 p-1.5 md:p-2 rounded-xl text-white shadow-[0_0_15px_rgba(220,38,38,0.8)]"><Icon name="Zap" className="w-5 h-5 md:w-6 md:h-6" /></div>
-                            <span className={`text-lg md:text-xl font-black tracking-tight ${view==='draw'?'text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.8)]':'text-orange-600'}`}>終極抽卡陣 v3.0</span>
+                            <div className="bg-gradient-to-r from-red-600 to-orange-500 p-1.5 md:p-2 rounded-xl text-white shadow-[0_0_15px_rgba(220,38,38,0.6)]"><Icon name="Zap" className="w-5 h-5 md:w-6 md:h-6" /></div>
+                            <span className="text-lg md:text-xl font-black tracking-tight bg-gradient-to-r from-orange-600 via-amber-500 to-red-600 bg-clip-text text-transparent">獎勵萌抽卡</span>
                         </div>
                         
-                        <div className="flex items-center gap-1 md:gap-3">
+                        <div className="flex items-center gap-1.5 md:gap-3">
                             <button onClick={()=>setSoundEnabled(!soundEnabled)} className={`px-3 py-1.5 rounded-full text-xs md:text-sm font-bold flex items-center gap-1 transition-all ${soundEnabled?'bg-green-100 text-green-700':'bg-slate-200 text-slate-500'}`}>
                                 <Icon name={soundEnabled?"Volume2":"VolumeX"} className="w-4 h-4" />
                                 <span className="hidden sm:inline">{soundEnabled?"音效 ON":"音效 OFF"}</span>
                             </button>
 
-                            <button onClick={() => setView('home')} className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-full font-bold transition-all ${view==='home'?'bg-orange-100 text-orange-600':view==='draw'?'text-slate-400 hover:text-white':'text-slate-500 hover:bg-slate-100'}`}>
+                            <button onClick={() => setView('home')} className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-full font-bold transition-all ${view==='home'?'bg-orange-500 text-white shadow-md':view==='draw'?'text-slate-300 hover:text-white':'text-slate-600 hover:bg-orange-50'}`}>
                                 <Icon name="Home" className="w-4 h-4 md:w-5 md:h-5" />
                                 <span className="text-sm md:text-base hidden sm:inline">首頁</span>
                             </button>
-                            <button onClick={handleEnterDraw} className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-full font-bold transition-all ${view==='draw'?'bg-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.8)]':'text-slate-500 hover:bg-slate-100'}`}>
+                            <button onClick={handleEnterDraw} className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-full font-bold transition-all ${view==='draw'?'bg-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.8)]':'text-slate-600 hover:bg-orange-50'}`}>
                                 <Icon name="Play" className="w-4 h-4 md:w-5 md:h-5" />
                                 <span className="text-sm md:text-base hidden sm:inline">抽卡</span>
                             </button>
-                            <button onClick={() => setView('admin')} className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-full font-bold transition-all ${view==='admin'?'bg-orange-100 text-orange-600':view==='draw'?'text-slate-400 hover:text-white':'text-slate-500 hover:bg-slate-100'}`}>
+                            <button onClick={() => setView('admin')} className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-full font-bold transition-all ${view==='admin'?'bg-orange-500 text-white shadow-md':view==='draw'?'text-slate-300 hover:text-white':'text-slate-600 hover:bg-orange-50'}`}>
                                 <Icon name="Settings" className="w-4 h-4 md:w-5 md:h-5" />
                                 <span className="text-sm md:text-base hidden sm:inline">管理</span>
                             </button>
@@ -544,12 +594,12 @@
 
                     <main className={`flex-1 w-full max-w-6xl mx-auto p-2 sm:p-4 md:p-6 relative z-10 ${view === 'draw' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto custom-scrollbar'}`}>
                         
+                        {/* 🌟 1. 首頁 (Home View) 🌟 */}
                         {view === 'home' && (
                             <div className="animate-slide-up flex flex-col h-full justify-between pb-2">
                                 <div>
                                     <div className="text-center mb-4 md:mb-6">
-                                        <div className="inline-block bg-orange-100 text-orange-700 font-bold px-3 py-1 rounded-full text-xs mb-2">當前班級：{activeClass}</div>
-                                        <h2 className="text-2xl md:text-3xl font-black mb-1">傳說獎勵卡池</h2>
+                                        <h2 className="text-2xl md:text-3xl font-black mb-1 text-slate-800">傳說獎勵卡池</h2>
                                         <p className="text-slate-500 text-sm md:text-base font-bold">目前卡池深度：{totalCards} 張</p>
                                     </div>
                                     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2 md:gap-3">
@@ -590,28 +640,36 @@
                                     </div>
                                     
                                     <button onClick={handleEnterDraw} className="w-full md:w-auto py-3 md:py-4 px-6 md:px-10 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-xl text-xl font-black shadow-[0_10px_20px_rgba(220,38,38,0.5)] flex items-center justify-center gap-2 hover:scale-[1.05] transition-transform">
-                                        進入終極召喚陣 <Icon name="Skull" className="fill-white" />
+                                        進入終極召喚陣 <Icon name="Sparkles" className="fill-white" />
                                     </button>
                                 </div>
 
                             </div>
                         )}
 
+                        {/* 🌟 2. 抽卡頁面 (Draw View - 風格優化與整站統一) 🌟 */}
                         {view === 'draw' && (
                             <div className="h-full flex flex-col w-full animate-zoom-in">
-                                <div className={`flex-1 flex flex-col p-3 md:p-6 rounded-[30px] shadow-2xl relative overflow-hidden transition-all duration-300 ${rollPhase === 'charging' ? 'bg-slate-900 border-2 border-red-600 shadow-[0_0_60px_rgba(220,38,38,0.6)]' : 'bg-slate-800 border-2 border-slate-700'}`}>
+                                <div className={`flex-1 flex flex-col p-3 md:p-6 rounded-[30px] shadow-2xl relative overflow-hidden transition-all duration-300 ${rollPhase === 'charging' ? 'bg-slate-900 border-2 border-red-600 shadow-[0_0_60px_rgba(220,38,38,0.6)]' : 'bg-slate-900/90 border-2 border-amber-500/30'}`}>
                                     
-                                    <div className="flex justify-between items-center mb-2 px-2 opacity-60">
-                                        <span className="text-white font-bold tracking-widest text-sm">勇者座號：{seatNumber} ({activeClass})</span>
-                                        <span className="text-white font-bold tracking-widest text-sm">抽取數量：{drawCount}</span>
+                                    <div className="flex justify-between items-center mb-2 px-2 border-b border-slate-800 pb-2">
+                                        <span className="text-amber-400 font-bold tracking-widest text-sm flex items-center gap-1.5">
+                                            <Icon name="Target" className="w-4 h-4 text-amber-500" /> 勇者座號：{seatNumber} 號
+                                        </span>
+                                        <span className="text-amber-400 font-bold tracking-widest text-sm flex items-center gap-1.5">
+                                            <Icon name="Sparkles" className="w-4 h-4 text-amber-500" /> 抽取數量：{drawCount} 張
+                                        </span>
                                     </div>
 
                                     <div className="flex-1 flex flex-wrap justify-center items-center gap-3 sm:gap-4 md:gap-6 relative min-h-0 py-2">
                                         
                                         {rollPhase === 'idle' && results.length === 0 && (
                                             <div className="text-center w-full">
-                                                <Icon name="Infinity" className="w-16 h-16 md:w-24 md:h-24 mx-auto text-slate-600 mb-4 opacity-50" />
-                                                <div className="text-slate-500 text-xl md:text-3xl font-black tracking-widest text-center">魔法陣已準備就緒</div>
+                                                <div className="w-20 h-20 md:w-28 md:h-28 mx-auto bg-amber-500/10 rounded-full flex items-center justify-center border border-amber-500/30 mb-4 animate-pulse">
+                                                    <Icon name="Sparkles" className="w-10 h-10 md:w-14 md:h-14 text-amber-400" />
+                                                </div>
+                                                <div className="text-amber-300 text-xl md:text-3xl font-black tracking-widest text-center drop-shadow-md">魔法陣已準備就緒</div>
+                                                <p className="text-slate-400 text-xs md:text-sm font-bold mt-2">點擊下方按鈕啟動命運召喚</p>
                                             </div>
                                         )}
 
@@ -625,8 +683,8 @@
                                                         <div className={`card-inner ${isFlipped ? 'flipped' : ''}`}>
                                                             
                                                             <div className="card-back shadow-[0_0_20px_rgba(0,0,0,0.8)]">
-                                                                <div className="w-16 h-16 rounded-full border-4 border-slate-500 flex items-center justify-center animate-spin-slow">
-                                                                    <Icon name="Star" className="text-slate-500 w-8 h-8" />
+                                                                <div className="w-16 h-16 rounded-full border-4 border-amber-500/70 flex items-center justify-center animate-spin-slow">
+                                                                    <Icon name="Star" className="text-amber-400 w-8 h-8" />
                                                                 </div>
                                                                 {rollPhase === 'charging' && <div className="absolute inset-0 bg-red-500/10 mix-blend-color-burn animate-pulse"></div>}
                                                             </div>
@@ -666,44 +724,45 @@
                                         )}
                                     </div>
 
-                                    <button onClick={handleDraw} disabled={rollPhase !== 'idle'} className={`shrink-0 w-full mt-2 py-4 md:py-5 rounded-2xl text-2xl md:text-3xl font-black text-white transition-all ${rollPhase !== 'idle' ?'bg-slate-800 text-slate-600 border-2 border-slate-700':'bg-gradient-to-r from-red-600 via-orange-600 to-red-600 bg-[length:200%_auto] shadow-[0_0_20px_rgba(220,38,38,0.5)] hover:scale-[1.03] hover:shadow-[0_0_30px_rgba(220,38,38,0.8)]'}`} style={{ animation: rollPhase==='idle' ? 'pulse-glow 2s infinite' : 'none' }}>
+                                    <button onClick={handleDraw} disabled={rollPhase !== 'idle'} className={`shrink-0 w-full mt-2 py-4 md:py-5 rounded-2xl text-2xl md:text-3xl font-black text-white transition-all ${rollPhase !== 'idle' ?'bg-slate-800 text-slate-600 border-2 border-slate-700':'bg-gradient-to-r from-red-600 via-orange-500 to-amber-500 bg-[length:200%_auto] shadow-[0_0_25px_rgba(249,115,22,0.6)] hover:scale-[1.02] hover:shadow-[0_0_35px_rgba(249,115,22,0.8)]'}`}>
                                         {rollPhase === 'charging' ? '💥 能量暴走中 💥' : rollPhase === 'revealing' ? '✨ 命運揭曉 ✨' : `立即審判 ${drawCount} 次`}
                                     </button>
                                 </div>
                             </div>
                         )}
 
+                        {/* 🌟 3. 管理頁面 (Admin View - 可選可愛 Icon & 無班級切換) 🌟 */}
                         {view === 'admin' && (
                             <div className="space-y-6 animate-slide-up pb-10">
                                 <div className="bg-white p-4 md:p-6 rounded-3xl flex flex-col md:flex-row gap-4 justify-between md:items-center shadow-sm">
                                     <div>
-                                        <h3 className="font-black text-xl text-slate-800">系統管理</h3>
-                                        <p className="text-xs text-slate-500 font-bold mt-1">切換班級與匯出/匯入卡池配置</p>
+                                        <h3 className="font-black text-xl text-slate-800">卡池管理系統</h3>
+                                        <p className="text-xs text-slate-500 font-bold mt-1">自由修改獎項、自訂可愛圖示與匯出備份</p>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
-                                        {['501班', '502班', '503班'].map(cls => (
-                                            <button key={cls} onClick={()=>setActiveClass(cls)} className={`px-3 py-1.5 rounded-xl font-bold text-sm transition-all ${activeClass===cls?'bg-orange-500 text-white shadow-md':'bg-orange-50 text-orange-600'}`}>{cls}</button>
-                                        ))}
-                                        <button onClick={exportConfigJSON} className="bg-blue-500 text-white px-3 py-1.5 rounded-xl font-bold text-sm hover:bg-blue-600 transition-colors shadow-sm">📥 匯出 JSON</button>
-                                        <label className="bg-purple-500 text-white px-3 py-1.5 rounded-xl font-bold text-sm hover:bg-purple-600 transition-colors shadow-sm cursor-pointer">
-                                            📤 匯入 JSON
+                                        <button onClick={exportConfigJSON} className="bg-blue-500 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-600 transition-colors shadow-sm flex items-center gap-1">
+                                            <Icon name="Download" className="w-4 h-4" /> 匯出 JSON
+                                        </button>
+                                        <label className="bg-purple-500 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-purple-600 transition-colors shadow-sm cursor-pointer flex items-center gap-1">
+                                            <Icon name="Upload" className="w-4 h-4" /> 匯入 JSON
                                             <input type="file" accept=".json" onChange={importConfigJSON} className="hidden" />
                                         </label>
-                                        <button onClick={()=>{if(confirm('警告：確定要重設為預設獎項？'))setItems(initialItems)}} className="bg-slate-200 px-3 py-1.5 rounded-xl font-bold text-sm hover:bg-slate-300 transition-colors text-slate-700">恢復預設</button>
-                                        <button onClick={()=>setHistory([])} className="bg-red-500 text-white px-3 py-1.5 rounded-xl font-bold text-sm hover:bg-red-600 transition-colors shadow-sm">清除紀錄</button>
+                                        <button onClick={()=>{if(confirm('警告：確定要重設為預設獎項？'))setItems(initialItems)}} className="bg-slate-200 px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-300 transition-colors text-slate-700">恢復預設</button>
+                                        <button onClick={()=>setHistory([])} className="bg-red-500 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-red-600 transition-colors shadow-sm">清除紀錄</button>
                                     </div>
                                 </div>
 
+                                {/* 新增獎項卡片 */}
                                 <div className="bg-white p-4 md:p-6 rounded-3xl shadow-sm border border-slate-200 border-l-8 border-l-green-400 relative overflow-hidden">
                                     <h4 className="font-bold flex items-center gap-2 text-lg text-slate-800 mb-4">
-                                        <Icon name="PlusCircle" className="text-green-500" /> 新增自訂獎項 (支援 AI 原畫網址)
+                                        <Icon name="PlusCircle" className="text-green-500" /> 新增自訂獎項
                                     </h4>
                                     <div className="grid grid-cols-1 md:grid-cols-5 gap-3 md:gap-4 items-end relative z-10">
-                                        <div className="md:col-span-1">
+                                        <div>
                                             <label className="block text-sm font-bold text-slate-600 mb-1">獎項名稱</label>
                                             <input type="text" value={newItem.name} onChange={e=>setNewItem({...newItem, name: e.target.value})} className="w-full border-2 border-slate-200 rounded-xl px-3 py-2 font-bold text-slate-700 outline-none focus:border-green-400 transition-colors" placeholder="例：作業減半" />
                                         </div>
-                                        <div className="md:col-span-1">
+                                        <div>
                                             <label className="block text-sm font-bold text-slate-600 mb-1">詳細說明</label>
                                             <input type="text" value={newItem.detail} onChange={e=>setNewItem({...newItem, detail: e.target.value})} className="w-full border-2 border-slate-200 rounded-xl px-3 py-2 font-bold text-slate-700 outline-none focus:border-green-400 transition-colors" placeholder="例：可免寫一半作業" />
                                         </div>
@@ -721,16 +780,18 @@
                                             </select>
                                         </div>
                                         
-                                        <div className="flex gap-2 items-center h-full">
-                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-inner ${newItem.rarity==='legendary'?'bg-gradient-to-br from-yellow-400 to-orange-500':newItem.rarity==='epic'?'bg-purple-500':newItem.rarity==='rare'?'bg-blue-500':'bg-stone-500'}`}>
-                                                <ExquisiteIcon name={newItem.icon} className={`w-6 h-6 ${newItem.rarity === 'legendary' ? 'legendary-card' : newItem.rarity === 'epic' ? 'epic-card' : newItem.rarity === 'rare' ? 'rare-card' : 'common-card'}`} />
-                                            </div>
-                                            <div className="flex-1">
-                                                <label className="block text-sm font-bold text-slate-600 mb-1">顯示圖示</label>
-                                                <select value={newItem.icon} onChange={e=>setNewItem({...newItem, icon: e.target.value})} className="w-full border-2 border-slate-200 rounded-xl px-3 py-2 font-bold text-slate-700 outline-none focus:border-green-400 transition-colors bg-white">
-                                                    {availableIcons.map(icon => <option key={icon} value={icon}>{icon}</option>)}
-                                                </select>
-                                            </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-slate-600 mb-1">可愛圖示</label>
+                                            <button 
+                                                onClick={()=>setIconPickerIdx('newItem')} 
+                                                className="w-full border-2 border-orange-200 bg-orange-50 hover:bg-orange-100 rounded-xl px-3 py-2 font-bold text-orange-700 flex items-center justify-between transition-all"
+                                            >
+                                                <span className="flex items-center gap-2">
+                                                    <Icon name={newItem.icon} className="w-5 h-5 text-orange-500" />
+                                                    <span>{newItem.icon}</span>
+                                                </span>
+                                                <span className="text-xs bg-orange-200 px-2 py-0.5 rounded-md">選擇</span>
+                                            </button>
                                         </div>
                                     </div>
                                     <button onClick={handleAddNewItem} className="w-full mt-4 bg-green-500 text-white font-black py-3 rounded-xl hover:bg-green-600 transition-colors shadow-md flex items-center justify-center gap-2 relative z-10">
@@ -738,13 +799,15 @@
                                     </button>
                                 </div>
 
+                                {/* 卡片清單與可愛 Icon 選擇器表格 */}
                                 <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-200">
                                     <div className="overflow-x-auto">
-                                        <table className="w-full text-left min-w-[600px]">
+                                        <table className="w-full text-left min-w-[650px]">
                                             <thead className="bg-slate-100">
                                                 <tr>
-                                                    <th className="px-6 py-4 text-slate-600 font-bold w-1/3">獎項</th>
-                                                    <th className="px-6 py-4 text-slate-600 font-bold w-32">階級設定</th>
+                                                    <th className="px-6 py-4 text-slate-600 font-bold w-1/3">獎項與封面</th>
+                                                    <th className="px-6 py-4 text-slate-600 font-bold w-36">可愛圖示</th>
+                                                    <th className="px-6 py-4 text-slate-600 font-bold w-36">階級設定</th>
                                                     <th className="px-6 py-4 text-slate-600 font-bold">張數</th>
                                                     <th className="px-6 py-4 text-slate-600 font-bold">機率</th>
                                                     <th className="px-6 py-4 text-slate-600 font-bold">操作</th>
@@ -761,13 +824,26 @@
                                                                     <ExquisiteIcon name={item.icon} className={`w-5 h-5 ${item.rarity === 'legendary' ? 'legendary-card' : item.rarity === 'epic' ? 'epic-card' : item.rarity === 'rare' ? 'rare-card' : 'common-card'}`} />
                                                                 </div>
                                                             )}
-                                                            <span className="text-lg text-slate-800 line-clamp-1">{item.name}</span>
+                                                            <div>
+                                                                <span className="text-base font-black text-slate-800 block">{item.name}</span>
+                                                                <span className="text-xs text-slate-400 block font-normal">{item.detail}</span>
+                                                            </div>
+                                                        </td>
+                                                        {/* 🎨 可點擊圖示選擇器 🎨 */}
+                                                        <td className="px-6 py-4">
+                                                            <button 
+                                                                onClick={()=>setIconPickerIdx(idx)}
+                                                                className="border border-orange-200 bg-orange-50 hover:bg-orange-100 text-orange-700 px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-2 transition-all shadow-sm"
+                                                            >
+                                                                <Icon name={item.icon} className="w-4 h-4 text-orange-500" />
+                                                                <span>{item.icon}</span>
+                                                            </button>
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <select 
                                                                 value={item.rarity} 
                                                                 onChange={e => updateItemRarity(idx, e.target.value)}
-                                                                className="w-full border-2 border-slate-200 rounded-xl px-2 py-2 font-bold text-slate-700 outline-none focus:border-orange-400 transition-all bg-white"
+                                                                className="w-full border-2 border-slate-200 rounded-xl px-2 py-1.5 font-bold text-slate-700 outline-none focus:border-orange-400 transition-all bg-white text-sm"
                                                             >
                                                                 <option value="common">普通 (灰)</option>
                                                                 <option value="rare">稀有 (藍)</option>
@@ -776,13 +852,13 @@
                                                             </select>
                                                         </td>
                                                         <td className="px-6 py-4">
-                                                            <input type="number" value={item.count} onChange={e=>updateItemCount(idx, e.target.value)} className="w-20 border-2 border-slate-200 rounded-xl text-center py-2 font-black text-lg text-slate-700 focus:border-red-400 focus:ring-2 focus:ring-red-100 outline-none transition-all" />
+                                                            <input type="number" value={item.count} onChange={e=>updateItemCount(idx, e.target.value)} className="w-16 border-2 border-slate-200 rounded-xl text-center py-1.5 font-black text-base text-slate-700 focus:border-red-400 focus:ring-2 focus:ring-red-100 outline-none transition-all" />
                                                         </td>
-                                                        <td className="px-6 py-4 text-orange-600 font-black text-lg">
+                                                        <td className="px-6 py-4 text-orange-600 font-black text-base">
                                                             {totalCards>0?((item.count/totalCards)*100).toFixed(1):0}%
                                                         </td>
                                                         <td className="px-6 py-4">
-                                                            <button onClick={()=>setItems(items.filter((_,i)=>i!==idx))} className="text-red-500 hover:text-white hover:bg-red-500 font-bold bg-red-50 px-4 py-2 rounded-xl transition-all shadow-sm">刪除</button>
+                                                            <button onClick={()=>setItems(items.filter((_,i)=>i!==idx))} className="text-red-500 hover:text-white hover:bg-red-500 font-bold bg-red-50 px-3 py-1.5 rounded-xl transition-all text-xs shadow-sm">刪除</button>
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -804,9 +880,9 @@
                                             <table className="w-full text-left min-w-[600px]">
                                                 <thead className="bg-slate-50">
                                                     <tr>
-                                                        <th className="px-6 py-3 text-slate-600 font-bold w-1/5">時間</th>
-                                                        <th className="px-6 py-3 text-slate-600 font-bold w-1/5">勇者座號 (班級)</th>
-                                                        <th className="px-6 py-3 text-slate-600 font-bold w-1/5">花費點數</th>
+                                                        <th className="px-6 py-3 text-slate-600 font-bold w-1/4">時間</th>
+                                                        <th className="px-6 py-3 text-slate-600 font-bold w-1/4">勇者座號</th>
+                                                        <th className="px-6 py-3 text-slate-600 font-bold w-1/4">花費點數</th>
                                                         <th className="px-6 py-3 text-slate-600 font-bold">獲得獎項</th>
                                                     </tr>
                                                 </thead>
@@ -815,7 +891,7 @@
                                                         <tr key={idx} className="hover:bg-slate-50 transition-colors">
                                                             <td className="px-6 py-4 text-slate-500 font-bold">{record.time}</td>
                                                             <td className="px-6 py-4 font-black text-lg text-slate-800">
-                                                                <span className="bg-slate-200 px-3 py-1 rounded-lg">{record.seat}號 ({record.class||'501班'})</span>
+                                                                <span className="bg-slate-200 px-3 py-1 rounded-lg">{record.seat}號</span>
                                                             </td>
                                                             <td className="px-6 py-4 font-black text-lg text-orange-500">
                                                                 {record.count * 10} 點
@@ -823,7 +899,7 @@
                                                             <td className="px-6 py-4">
                                                                 <div className="flex flex-wrap gap-2">
                                                                     {record.items.map((item, i) => (
-                                                                        <span key={i} className={`text-xs md:text-sm font-bold px-2 py-1 rounded text-white shadow-sm ${item.color}`}>
+                                                                        <span key={i} className={`text-xs font-bold px-2 py-1 rounded text-white shadow-sm ${item.color}`}>
                                                                             {item.name}
                                                                         </span>
                                                                     ))}
