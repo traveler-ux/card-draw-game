@@ -183,10 +183,19 @@
             const [activeClass, setActiveClass] = useState('501班');
             
             const [items, setItems] = useState(() => {
-                const saved = localStorage.getItem('epicRewards_items_v6');
+                const saved = localStorage.getItem('epicRewards_items_v6') || localStorage.getItem('epicRewards_items_v5');
                 if (saved) {
-                    const parsed = JSON.parse(saved);
-                    return parsed.map(item => ({...item, color: rarityColorMap[item.rarity] || item.color}));
+                    try {
+                        const parsed = JSON.parse(saved);
+                        return parsed.map(item => {
+                            const match = initialItems.find(i => i.name === item.name);
+                            return {
+                                ...item,
+                                image: item.image || (match ? match.image : undefined),
+                                color: rarityColorMap[item.rarity] || item.color
+                            };
+                        });
+                    } catch (e) {}
                 }
                 return initialItems;
             });
