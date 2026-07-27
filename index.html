@@ -343,15 +343,14 @@
             const speakCardRarity = (rarity) => {
                 if (!soundEnabled) return;
                 if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel();
                     let text = "";
-                    if (rarity === 'legendary') text = "金光閃閃！傳說降臨！";
-                    else if (rarity === 'epic') text = "哇！史詩卡片！";
+                    if (rarity === 'legendary') text = "傳說";
+                    else if (rarity === 'epic') text = "史詩";
                     
                     if (text !== "") {
                         const utterance = new SpeechSynthesisUtterance(text);
                         utterance.lang = 'zh-TW';
-                        utterance.rate = 0.88;
+                        utterance.rate = 0.95;
                         utterance.pitch = 0.55; // 🎯 爐石戰記風格：雄渾低沉男音
                         
                         const voices = window.speechSynthesis.getVoices();
@@ -748,8 +747,8 @@
                                         )}
                                         
                                         {rollPhase === 'charging' && (
-                                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none text-center w-full px-2">
-                                                <div className="text-amber-300 text-3xl sm:text-5xl md:text-6xl font-black tracking-widest drop-shadow-[0_5px_25px_rgba(245,158,11,1)] animate-pulse" style={{WebkitTextStroke: '2px #78350f'}}>🎯 命運輪盤運轉中！</div>
+                                            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none text-center w-full px-2">
+                                                <div className="text-amber-300 text-2xl sm:text-4xl md:text-5xl font-black tracking-widest drop-shadow-[0_5px_25px_rgba(245,158,11,1)] animate-pulse" style={{WebkitTextStroke: '2px #78350f'}}>🎯 命運輪盤運轉中！</div>
                                             </div>
                                         )}
                                     </div>
