@@ -344,12 +344,20 @@
                 if (!soundEnabled) return;
                 if ('speechSynthesis' in window) {
                     window.speechSynthesis.cancel();
-                    let text = rarity === 'legendary' ? "傳說！神話降臨！" : rarity === 'epic' ? "史詩獎勵！" : "";
+                    let text = "";
+                    if (rarity === 'legendary') text = "金光閃閃！傳說降臨！";
+                    else if (rarity === 'epic') text = "哇！史詩卡片！";
+                    
                     if (text !== "") {
                         const utterance = new SpeechSynthesisUtterance(text);
                         utterance.lang = 'zh-TW';
-                        utterance.rate = 0.9;
-                        utterance.pitch = rarity === 'legendary' ? 0.9 : 0.8;
+                        utterance.rate = 0.88;
+                        utterance.pitch = 0.55; // 🎯 爐石戰記風格：雄渾低沉男音
+                        
+                        const voices = window.speechSynthesis.getVoices();
+                        const maleVoice = voices.find(v => (v.lang.includes('zh') || v.lang.includes('cmn')) && (v.name.includes('Yunxi') || v.name.includes('Kangkang') || v.name.includes('Yunyang') || v.name.includes('Hanhan') || v.name.includes('Male') || v.name.includes('Taiwan')));
+                        if (maleVoice) utterance.voice = maleVoice;
+
                         window.speechSynthesis.speak(utterance);
                     }
                 }
@@ -715,19 +723,21 @@
 
                                                                 <div className="absolute inset-[-50%] overflow-hidden rounded-full mix-blend-screen opacity-30 z-0 pointer-events-none"><div className="bg-rays"></div></div>
                                                                 
-                                                                <div className={`relative z-10 w-full h-full flex flex-col items-center justify-between p-2 text-center ${res.color} text-white m-1 rounded-lg ${res.rarity === 'legendary' ? 'border-2 border-yellow-200' : res.rarity === 'epic' ? 'border-2 border-purple-200' : res.rarity === 'rare' ? 'border-2 border-cyan-200' : ''}`}>
+                                                                <div className={`relative z-10 w-full h-full flex flex-col items-center justify-between p-1.5 text-center ${res.color} text-white rounded-lg ${res.rarity === 'legendary' ? 'border-2 border-yellow-200' : res.rarity === 'epic' ? 'border-2 border-purple-200' : res.rarity === 'rare' ? 'border-2 border-cyan-200' : ''}`}>
                                                                     
                                                                     {res.image ? (
-                                                                        <img src={res.image} alt={res.name} className="w-full h-24 sm:h-32 object-cover rounded-md shadow-lg my-1 border border-white/20" />
-                                                                    ) : (
-                                                                        <div className="icon-area relative p-2 md:p-3 rounded-full my-1 shadow-inner border-2 border-white/10 shrink-0">
-                                                                            <ExquisiteIcon name={res.icon} className="w-6 h-6 md:w-10 md:h-10" />
+                                                                        <div className="w-full flex-1 flex items-center justify-center overflow-hidden rounded-md bg-black/20 p-0.5 my-0.5 shadow-inner">
+                                                                            <img src={res.image} alt={res.name} className="w-full h-full object-contain rounded-md" />
                                                                         </div>
+                                                                    ) : (
+                                                                        <>
+                                                                            <div className="icon-area relative p-2 md:p-3 rounded-full my-1 shadow-inner border-2 border-white/10 shrink-0">
+                                                                                <ExquisiteIcon name={res.icon} className="w-6 h-6 md:w-10 md:h-10" />
+                                                                            </div>
+                                                                            <div className="font-black text-base sm:text-lg md:text-xl tracking-wider drop-shadow-md leading-tight mb-0.5 w-full line-clamp-1 px-0.5">{res.name}</div>
+                                                                            <div className="text-[9px] sm:text-[10px] md:text-xs opacity-95 font-bold bg-black/40 px-1.5 py-1 rounded w-full line-clamp-2 leading-snug">{res.detail}</div>
+                                                                        </>
                                                                     )}
-
-                                                                    <div className="font-black text-base sm:text-lg md:text-xl tracking-wider drop-shadow-md leading-tight mb-0.5 w-full line-clamp-1 px-0.5">{res.name}</div>
-                                                                    
-                                                                    <div className="text-[9px] sm:text-[10px] md:text-xs opacity-95 font-bold bg-black/40 px-1.5 py-1 rounded w-full line-clamp-2 leading-snug">{res.detail}</div>
                                                                 </div>
                                                             </div>
 
@@ -738,14 +748,14 @@
                                         )}
                                         
                                         {rollPhase === 'charging' && (
-                                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none text-center w-full">
-                                                <div className="text-white text-5xl md:text-7xl font-black tracking-widest drop-shadow-[0_5px_15px_rgba(220,38,38,1)] animate-pulse" style={{WebkitTextStroke: '2px #b91c1c'}}>突破臨界點</div>
+                                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none text-center w-full px-2">
+                                                <div className="text-amber-300 text-3xl sm:text-5xl md:text-6xl font-black tracking-widest drop-shadow-[0_5px_25px_rgba(245,158,11,1)] animate-pulse" style={{WebkitTextStroke: '2px #78350f'}}>🎯 命運輪盤運轉中！</div>
                                             </div>
                                         )}
                                     </div>
 
                                     <button onClick={handleDraw} disabled={rollPhase !== 'idle'} className={`shrink-0 w-full mt-2 py-4 md:py-5 rounded-2xl text-2xl md:text-3xl font-black text-white transition-all ${rollPhase !== 'idle' ?'bg-slate-800 text-slate-600 border-2 border-slate-700':'bg-gradient-to-r from-red-600 via-orange-500 to-amber-500 bg-[length:200%_auto] shadow-[0_0_25px_rgba(249,115,22,0.6)] hover:scale-[1.02] hover:shadow-[0_0_35px_rgba(249,115,22,0.8)]'}`}>
-                                        {rollPhase === 'charging' ? '💥 能量暴走中 💥' : rollPhase === 'revealing' ? '✨ 命運揭曉 ✨' : `立即審判 ${drawCount} 次`}
+                                        {rollPhase === 'charging' ? '🎯 命運輪盤運轉中...' : rollPhase === 'revealing' ? '✨ 命運揭曉 ✨' : `立即審判 ${drawCount} 次`}
                                     </button>
                                 </div>
                             </div>
