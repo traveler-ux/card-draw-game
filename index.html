@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>獎勵萌抽卡 - 終極史詩版 v3.1</title>
+    <title>獎勵萌抽卡 - 終極史詩版 v3.2</title>
     <!-- 使用 CDN 載入必要的套件 -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -148,7 +148,7 @@
         const { useState, useEffect, useMemo, useRef } = React;
         
         const Icon = ({ name, className }) => {
-            return <i data-lucide={name.toLowerCase()} className={className}></i>;
+            return <i data-lucide={(name || 'star').toLowerCase()} className={className}></i>;
         };
 
         // 🎨 豐富可愛的選擇圖示清單 🎨
@@ -157,7 +157,7 @@
             'Coffee', 'Music', 'Sparkles', 'Map-Pin', 'Cookie', 'Flame', 
             'Thumbs-Up', 'Smile', 'Sun', 'Moon', 'Book', 'User-Check', 
             'Trophy', 'Medal', 'Award', 'Palette', 'PartyPopper', 'Utensils',
-            'Check-Circle2', 'Flame', 'Sparkle', 'Chevron-Right'
+            'RotateCcw', 'RefreshCw', 'Sparkle', 'Chevron-Right'
         ];
 
         const rarityColorMap = {
@@ -167,22 +167,23 @@
             legendary: 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600'
         };
 
-        // 🌟 預設卡池包含 AI 原畫圖片與可愛圖示對應 🌟
+        // 🌟 更新預設卡池內容 (包含最新稀有度與說明修改) 🌟
         const initialItems = [
             { name: "再抽1+1", detail: "好運連連，再抽兩張", count: 1, icon: 'Flame', color: 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600', rarity: 'legendary', image: 'images/card_legendary_flame.jpg' },
+            { name: "記得微笑", detail: "老師請記得微笑", count: 1, icon: 'Smile', color: 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600', rarity: 'legendary' },
             { name: "老師座", detail: "可坐老師的座位半天", count: 4, icon: 'Crown', color: 'bg-purple-500', rarity: 'epic', image: 'images/card_epic_crown.jpg' },
             { name: "免死金牌", detail: "抵銷一次處罰", count: 5, icon: 'Shield-Alert', color: 'bg-purple-500', rarity: 'epic', image: 'images/card_epic_shield.jpg' },
-            { name: "點歌時間", detail: "可以在12:30前點歌在班上放", count: 15, icon: 'Music', color: 'bg-purple-500', rarity: 'epic' },
-            { name: "活動大進擊", detail: "全班增加活動時間", count: 5, icon: 'Zap', color: 'bg-purple-500', rarity: 'epic' },
+            { name: "三日座位", detail: "自選座位三天", count: 5, icon: 'Map-Pin', color: 'bg-purple-500', rarity: 'epic' },
+            { name: "活動大進擊", detail: "集滿3張可進行班級小活動", count: 5, icon: 'Zap', color: 'bg-purple-500', rarity: 'epic' },
+            { name: "點歌時間", detail: "可以在12:30前點歌在班上放", count: 15, icon: 'Music', color: 'bg-blue-500', rarity: 'rare' },
+            { name: "命運的小禮物", detail: "由轉盤抽出小禮物", count: 5, icon: 'Gift', color: 'bg-blue-500', rarity: 'rare' },
+            { name: "回到原點卡", detail: "最多可回收自己3張用不到的卡片變回點數。", count: 5, icon: 'RotateCcw', color: 'bg-blue-500', rarity: 'rare' },
             { name: "短文免寫", detail: "短文免寫二次", count: 10, icon: 'Book', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "免午休", detail: "獲得3天自由午休時間", count: 10, icon: 'Sun', color: 'bg-blue-500', rarity: 'rare' },
+            { name: "免午休", detail: "獲得2天自由午休時間", count: 10, icon: 'Sun', color: 'bg-blue-500', rarity: 'rare' },
             { name: "值日生", detail: "值日生PASS一次", count: 10, icon: 'User-Check', color: 'bg-blue-500', rarity: 'rare' },
             { name: "聯絡簿讚美", detail: "獲得老師的讚美", count: 9, icon: 'Sparkles', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "三日座位", detail: "自選座位三天", count: 5, icon: 'Map-Pin', color: 'bg-blue-500', rarity: 'rare' },
             { name: "優先選擇", detail: "獲得優先選擇權", count: 10, icon: 'Award', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "零食時間", detail: "獲得吃零食的自由時間", count: 10, icon: 'Cookie', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "記得微笑", detail: "老師請記得微笑", count: 1, icon: 'Smile', color: 'bg-stone-500', rarity: 'common' },
-            { name: "命運的小禮物", detail: "由轉盤抽出小禮物", count: 5, icon: 'Gift', color: 'bg-stone-500', rarity: 'common' },
+            { name: "零食時間", detail: "獲得吃零食的自由時間", count: 10, icon: 'Cookie', color: 'bg-blue-500', rarity: 'rare' }
         ];
 
         function App() {
@@ -191,7 +192,7 @@
             const [iconPickerIdx, setIconPickerIdx] = useState(null); // 控制 Icon 選擇器彈窗
             
             const [items, setItems] = useState(() => {
-                const saved = localStorage.getItem('epicRewards_items_v6') || localStorage.getItem('epicRewards_items_v5');
+                const saved = localStorage.getItem('epicRewards_items_v7');
                 if (saved) {
                     try {
                         const parsed = JSON.parse(saved);
@@ -217,7 +218,7 @@
             const [ssrModalItem, setSsrModalItem] = useState(null);
 
             const [history, setHistory] = useState(() => {
-                const saved = localStorage.getItem('epicRewards_history_v6');
+                const saved = localStorage.getItem('epicRewards_history_v7');
                 return saved ? JSON.parse(saved) : [];
             });
             const [seatNumber, setSeatNumber] = useState('');
@@ -230,8 +231,8 @@
             }, []);
 
             useEffect(() => {
-                localStorage.setItem('epicRewards_items_v6', JSON.stringify(items));
-                localStorage.setItem('epicRewards_history_v6', JSON.stringify(history));
+                localStorage.setItem('epicRewards_items_v7', JSON.stringify(items));
+                localStorage.setItem('epicRewards_history_v7', JSON.stringify(history));
                 if (window.lucide) window.lucide.createIcons();
             }, [items, history, view, results, rollPhase, revealedIdxs, ssrModalItem, iconPickerIdx]);
 
@@ -446,6 +447,24 @@
                 setItems(newItems);
             };
 
+            const updateItemImage = (idx, imageSrc) => {
+                const newItems = [...items];
+                newItems[idx].image = imageSrc;
+                setItems(newItems);
+            };
+
+            // 📁 處理本地電腦圖片檔案讀取 (Data URL/Base64)
+            const handleLocalFileUpload = (e, callback) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (uploadEvent) => {
+                        callback(uploadEvent.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
             const handleAddNewItem = () => {
                 if (!newItem.name.trim()) {
                     alert('請輸入獎項名稱！');
@@ -604,8 +623,9 @@
                                     </div>
                                     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2 md:gap-3">
                                         {items.map((item, idx) => (
-                                            <div key={idx} className={`bg-white p-2 md:p-3 rounded-2xl shadow-sm border-b-4 border-slate-200 hover:scale-105 hover:shadow-xl transition-all flex flex-col items-center justify-center text-center relative overflow-hidden ${item.rarity==='legendary'?'border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]':''}`}>
+                                            <div key={idx} className={`bg-white p-2 md:p-3 rounded-2xl shadow-sm border-b-4 border-slate-200 hover:scale-105 hover:shadow-xl transition-all flex flex-col items-center justify-center text-center relative overflow-hidden ${item.rarity==='legendary'?'border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]':item.rarity==='epic'?'border-purple-400':''}`}>
                                                 {item.rarity === 'legendary' && <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[9px] font-black px-1.5 py-0.5 rounded-bl-lg">傳說</div>}
+                                                {item.rarity === 'epic' && <div className="absolute top-0 right-0 bg-purple-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-bl-lg">史詩</div>}
                                                 
                                                 {item.image ? (
                                                     <img src={item.image} alt={item.name} className="w-10 h-10 md:w-12 md:h-12 rounded-xl object-cover mb-2 shadow-md border border-amber-300 shrink-0" />
@@ -731,13 +751,13 @@
                             </div>
                         )}
 
-                        {/* 🌟 3. 管理頁面 (Admin View - 可選可愛 Icon & 無班級切換) 🌟 */}
+                        {/* 🌟 3. 管理頁面 (Admin View - 可選電腦圖片與可愛 Icon) 🌟 */}
                         {view === 'admin' && (
                             <div className="space-y-6 animate-slide-up pb-10">
-                                <div className="bg-white p-4 md:p-6 rounded-3xl flex flex-col md:flex-row gap-4 justify-between md:items-center shadow-sm">
+                                <div className="bg-white p-4 md:p-6 rounded-3xl flex flex-col md:flex-row gap-4 justify-between md:items-center shadow-sm border border-slate-200">
                                     <div>
                                         <h3 className="font-black text-xl text-slate-800">卡池管理系統</h3>
-                                        <p className="text-xs text-slate-500 font-bold mt-1">自由修改獎項、自訂可愛圖示與匯出備份</p>
+                                        <p className="text-xs text-slate-500 font-bold mt-1">自由修改獎項、自訂可愛圖示/電腦圖片與匯出備份</p>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         <button onClick={exportConfigJSON} className="bg-blue-500 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-600 transition-colors shadow-sm flex items-center gap-1">
@@ -747,7 +767,7 @@
                                             <Icon name="Upload" className="w-4 h-4" /> 匯入 JSON
                                             <input type="file" accept=".json" onChange={importConfigJSON} className="hidden" />
                                         </label>
-                                        <button onClick={()=>{if(confirm('警告：確定要重設為預設獎項？'))setItems(initialItems)}} className="bg-slate-200 px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-300 transition-colors text-slate-700">恢復預設</button>
+                                        <button onClick={()=>{if(confirm('警告：確定要重設為預設卡池內容？'))setItems(initialItems)}} className="bg-slate-200 px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-300 transition-colors text-slate-700">恢復預設</button>
                                         <button onClick={()=>setHistory([])} className="bg-red-500 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-red-600 transition-colors shadow-sm">清除紀錄</button>
                                     </div>
                                 </div>
@@ -757,7 +777,7 @@
                                     <h4 className="font-bold flex items-center gap-2 text-lg text-slate-800 mb-4">
                                         <Icon name="PlusCircle" className="text-green-500" /> 新增自訂獎項
                                     </h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-5 gap-3 md:gap-4 items-end relative z-10">
+                                    <div className="grid grid-cols-1 md:grid-cols-6 gap-3 md:gap-4 items-end relative z-10">
                                         <div>
                                             <label className="block text-sm font-bold text-slate-600 mb-1">獎項名稱</label>
                                             <input type="text" value={newItem.name} onChange={e=>setNewItem({...newItem, name: e.target.value})} className="w-full border-2 border-slate-200 rounded-xl px-3 py-2 font-bold text-slate-700 outline-none focus:border-green-400 transition-colors" placeholder="例：作業減半" />
@@ -765,10 +785,6 @@
                                         <div>
                                             <label className="block text-sm font-bold text-slate-600 mb-1">詳細說明</label>
                                             <input type="text" value={newItem.detail} onChange={e=>setNewItem({...newItem, detail: e.target.value})} className="w-full border-2 border-slate-200 rounded-xl px-3 py-2 font-bold text-slate-700 outline-none focus:border-green-400 transition-colors" placeholder="例：可免寫一半作業" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold text-slate-600 mb-1">圖片網址 (選填)</label>
-                                            <input type="text" value={newItem.image} onChange={e=>setNewItem({...newItem, image: e.target.value})} className="w-full border-2 border-slate-200 rounded-xl px-3 py-2 font-bold text-slate-700 outline-none focus:border-green-400 transition-colors" placeholder="例：images/my_card.jpg" />
                                         </div>
                                         <div>
                                             <label className="block text-sm font-bold text-slate-600 mb-1">稀有等級</label>
@@ -779,7 +795,6 @@
                                                 <option value="legendary">傳說 (金底)</option>
                                             </select>
                                         </div>
-                                        
                                         <div>
                                             <label className="block text-sm font-bold text-slate-600 mb-1">可愛圖示</label>
                                             <button 
@@ -788,10 +803,39 @@
                                             >
                                                 <span className="flex items-center gap-2">
                                                     <Icon name={newItem.icon} className="w-5 h-5 text-orange-500" />
-                                                    <span>{newItem.icon}</span>
+                                                    <span className="truncate">{newItem.icon}</span>
                                                 </span>
-                                                <span className="text-xs bg-orange-200 px-2 py-0.5 rounded-md">選擇</span>
+                                                <span className="text-xs bg-orange-200 px-2 py-0.5 rounded-md shrink-0">選擇</span>
                                             </button>
+                                        </div>
+
+                                        {/* 電腦圖片檔選擇器 */}
+                                        <div>
+                                            <label className="block text-sm font-bold text-slate-600 mb-1">電腦圖片 (選填)</label>
+                                            <label className="w-full border-2 border-dashed border-blue-300 bg-blue-50 hover:bg-blue-100 rounded-xl px-3 py-2 font-bold text-blue-700 flex items-center justify-center gap-1 cursor-pointer transition-colors text-sm">
+                                                <Icon name="Upload" className="w-4 h-4 text-blue-500" />
+                                                <span className="truncate">{newItem.image ? '已選圖片' : '選擇檔案'}</span>
+                                                <input 
+                                                    type="file" 
+                                                    accept="image/*" 
+                                                    onChange={e => handleLocalFileUpload(e, base64 => setNewItem({...newItem, image: base64}))} 
+                                                    className="hidden" 
+                                                />
+                                            </label>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-slate-600 mb-1">預覽</label>
+                                            <div className="h-10 flex items-center justify-center">
+                                                {newItem.image ? (
+                                                    <div className="relative">
+                                                        <img src={newItem.image} alt="預覽" className="w-10 h-10 rounded-xl object-cover border border-amber-300 shadow-sm" />
+                                                        <button onClick={()=>setNewItem({...newItem, image: ''})} className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">✕</button>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-xs text-slate-400 font-bold">無封面</span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                     <button onClick={handleAddNewItem} className="w-full mt-4 bg-green-500 text-white font-black py-3 rounded-xl hover:bg-green-600 transition-colors shadow-md flex items-center justify-center gap-2 relative z-10">
@@ -799,13 +843,14 @@
                                     </button>
                                 </div>
 
-                                {/* 卡片清單與可愛 Icon 選擇器表格 */}
+                                {/* 卡片清單與電腦圖片／可愛 Icon 選擇器表格 */}
                                 <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-200">
                                     <div className="overflow-x-auto">
-                                        <table className="w-full text-left min-w-[650px]">
+                                        <table className="w-full text-left min-w-[700px]">
                                             <thead className="bg-slate-100">
                                                 <tr>
-                                                    <th className="px-6 py-4 text-slate-600 font-bold w-1/3">獎項與封面</th>
+                                                    <th className="px-6 py-4 text-slate-600 font-bold w-1/4">獎項名稱與說明</th>
+                                                    <th className="px-6 py-4 text-slate-600 font-bold w-44">封面 / 圖片</th>
                                                     <th className="px-6 py-4 text-slate-600 font-bold w-36">可愛圖示</th>
                                                     <th className="px-6 py-4 text-slate-600 font-bold w-36">階級設定</th>
                                                     <th className="px-6 py-4 text-slate-600 font-bold">張數</th>
@@ -816,20 +861,45 @@
                                             <tbody className="divide-y divide-slate-100">
                                                 {items.map((item, idx) => (
                                                     <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                                                        <td className="px-6 py-4 font-bold flex items-center gap-3">
-                                                            {item.image ? (
-                                                                <img src={item.image} alt={item.name} className="w-10 h-10 rounded-xl object-cover shadow-md border border-amber-300 shrink-0" />
-                                                            ) : (
-                                                                <div className={`${item.color} w-10 h-10 rounded-xl flex shrink-0 items-center justify-center text-white shadow-md relative overflow-hidden transition-colors duration-300`}>
-                                                                    <ExquisiteIcon name={item.icon} className={`w-5 h-5 ${item.rarity === 'legendary' ? 'legendary-card' : item.rarity === 'epic' ? 'epic-card' : item.rarity === 'rare' ? 'rare-card' : 'common-card'}`} />
-                                                                </div>
-                                                            )}
-                                                            <div>
-                                                                <span className="text-base font-black text-slate-800 block">{item.name}</span>
-                                                                <span className="text-xs text-slate-400 block font-normal">{item.detail}</span>
+                                                        <td className="px-6 py-4 font-bold">
+                                                            <span className="text-base font-black text-slate-800 block">{item.name}</span>
+                                                            <span className="text-xs text-slate-400 block font-normal mt-0.5">{item.detail}</span>
+                                                        </td>
+
+                                                        {/* 🖼️ 電腦圖片檔案選擇器 🖼️ */}
+                                                        <td className="px-6 py-4">
+                                                            <div className="flex items-center gap-2">
+                                                                {item.image ? (
+                                                                    <div className="relative group shrink-0">
+                                                                        <img src={item.image} alt={item.name} className="w-10 h-10 rounded-xl object-cover shadow-md border border-amber-300" />
+                                                                        <button 
+                                                                            onClick={() => updateItemImage(idx, '')}
+                                                                            title="移除自訂圖片"
+                                                                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold shadow-md hover:scale-110 transition-transform"
+                                                                        >
+                                                                            ✕
+                                                                        </button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className={`${item.color} w-10 h-10 rounded-xl flex shrink-0 items-center justify-center text-white shadow-md relative overflow-hidden transition-colors duration-300`}>
+                                                                        <ExquisiteIcon name={item.icon} className={`w-5 h-5 ${item.rarity === 'legendary' ? 'legendary-card' : item.rarity === 'epic' ? 'epic-card' : item.rarity === 'rare' ? 'rare-card' : 'common-card'}`} />
+                                                                    </div>
+                                                                )}
+
+                                                                <label className="border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 px-2.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1 cursor-pointer transition-all shadow-sm shrink-0">
+                                                                    <Icon name="Upload" className="w-3.5 h-3.5 text-blue-500" />
+                                                                    <span>{item.image ? '換圖' : '選電腦圖'}</span>
+                                                                    <input 
+                                                                        type="file" 
+                                                                        accept="image/*" 
+                                                                        onChange={e => handleLocalFileUpload(e, base64 => updateItemImage(idx, base64))} 
+                                                                        className="hidden" 
+                                                                    />
+                                                                </label>
                                                             </div>
                                                         </td>
-                                                        {/* 🎨 可點擊圖示選擇器 🎨 */}
+
+                                                        {/* 🎨 可愛圖示選擇器 🎨 */}
                                                         <td className="px-6 py-4">
                                                             <button 
                                                                 onClick={()=>setIconPickerIdx(idx)}
@@ -839,6 +909,7 @@
                                                                 <span>{item.icon}</span>
                                                             </button>
                                                         </td>
+
                                                         <td className="px-6 py-4">
                                                             <select 
                                                                 value={item.rarity} 
