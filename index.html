@@ -167,23 +167,23 @@
             legendary: 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600'
         };
 
-        // 🌟 更新預設卡池內容 (包含最新稀有度與說明修改) 🌟
+        // 🌟 預設卡池包含 AI 原畫圖片與對應檔案 🌟
         const initialItems = [
             { name: "再抽1+1", detail: "好運連連，再抽兩張", count: 1, icon: 'Flame', color: 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600', rarity: 'legendary', image: 'images/card_legendary_flame.jpg' },
-            { name: "記得微笑", detail: "老師請記得微笑", count: 1, icon: 'Smile', color: 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600', rarity: 'legendary' },
-            { name: "老師座", detail: "可坐老師的座位半天", count: 4, icon: 'Crown', color: 'bg-purple-500', rarity: 'epic', image: 'images/card_epic_crown.jpg' },
-            { name: "免死金牌", detail: "抵銷一次處罰", count: 5, icon: 'Shield-Alert', color: 'bg-purple-500', rarity: 'epic', image: 'images/card_epic_shield.jpg' },
-            { name: "三日座位", detail: "自選座位三天", count: 5, icon: 'Map-Pin', color: 'bg-purple-500', rarity: 'epic' },
-            { name: "活動大進擊", detail: "集滿3張可進行班級小活動", count: 5, icon: 'Zap', color: 'bg-purple-500', rarity: 'epic' },
-            { name: "點歌時間", detail: "可以在12:30前點歌在班上放", count: 15, icon: 'Music', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "命運的小禮物", detail: "由轉盤抽出小禮物", count: 5, icon: 'Gift', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "回到原點卡", detail: "最多可回收自己3張用不到的卡片變回點數。", count: 5, icon: 'RotateCcw', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "短文免寫", detail: "短文免寫二次", count: 10, icon: 'Book', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "免午休", detail: "獲得2天自由午休時間", count: 10, icon: 'Sun', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "值日生", detail: "值日生PASS一次", count: 10, icon: 'User-Check', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "聯絡簿讚美", detail: "獲得老師的讚美", count: 9, icon: 'Sparkles', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "優先選擇", detail: "獲得優先選擇權", count: 10, icon: 'Award', color: 'bg-blue-500', rarity: 'rare' },
-            { name: "零食時間", detail: "獲得吃零食的自由時間", count: 10, icon: 'Cookie', color: 'bg-blue-500', rarity: 'rare' }
+            { name: "記得微笑", detail: "老師請記得微笑", count: 1, icon: 'Smile', color: 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600', rarity: 'legendary', image: 'images/請記得微笑卡.jpg' },
+            { name: "老師座", detail: "可坐老師的座位半天", count: 4, icon: 'Crown', color: 'bg-purple-500', rarity: 'epic', image: 'images/老師座卡_1.jpg' },
+            { name: "免死金牌", detail: "抵銷一次處罰", count: 5, icon: 'Shield-Alert', color: 'bg-purple-500', rarity: 'epic', image: 'images/免死金牌卡_1.jpg' },
+            { name: "三日座位", detail: "自選座位三天", count: 5, icon: 'Map-Pin', color: 'bg-purple-500', rarity: 'epic', image: 'images/三日座位卡.jpg' },
+            { name: "活動大進擊", detail: "集滿3張可進行班級小活動", count: 5, icon: 'Zap', color: 'bg-purple-500', rarity: 'epic', image: 'images/活動大進擊卡.jpg' },
+            { name: "點歌時間", detail: "可以在12:30前點歌在班上放", count: 15, icon: 'Music', color: 'bg-blue-500', rarity: 'rare', image: 'images/點歌時間卡.jpg' },
+            { name: "命運的小禮物", detail: "由轉盤抽出小禮物", count: 5, icon: 'Gift', color: 'bg-blue-500', rarity: 'rare', image: 'images/命運的小禮物卡_2.jpg' },
+            { name: "回到原點卡", detail: "最多可回收自己3張用不到的卡片變回點數。", count: 5, icon: 'RotateCcw', color: 'bg-blue-500', rarity: 'rare', image: 'images/回到原點卡.jpg' },
+            { name: "短文免寫", detail: "短文免寫二次", count: 10, icon: 'Book', color: 'bg-blue-500', rarity: 'rare', image: 'images/短文免寫卡.jpg' },
+            { name: "免午休", detail: "獲得2天自由午休時間", count: 10, icon: 'Sun', color: 'bg-blue-500', rarity: 'rare', image: 'images/免午休卡_2.jpg' },
+            { name: "值日生", detail: "值日生PASS一次", count: 10, icon: 'User-Check', color: 'bg-blue-500', rarity: 'rare', image: 'images/值日生PASS卡_1.jpg' },
+            { name: "聯絡簿讚美", detail: "獲得老師的讚美", count: 9, icon: 'Sparkles', color: 'bg-blue-500', rarity: 'rare', image: 'images/聯絡簿讚美卡.jpg' },
+            { name: "優先選擇", detail: "獲得優先選擇權", count: 10, icon: 'Award', color: 'bg-blue-500', rarity: 'rare', image: 'images/優先選擇卡.png' },
+            { name: "零食時間", detail: "獲得吃零食的自由時間", count: 10, icon: 'Cookie', color: 'bg-blue-500', rarity: 'rare', image: 'images/零食時間卡.jpg' }
         ];
 
         function App() {
@@ -192,7 +192,7 @@
             const [iconPickerIdx, setIconPickerIdx] = useState(null); // 控制 Icon 選擇器彈窗
             
             const [items, setItems] = useState(() => {
-                const saved = localStorage.getItem('epicRewards_items_v7');
+                const saved = localStorage.getItem('epicRewards_items_v8');
                 if (saved) {
                     try {
                         const parsed = JSON.parse(saved);
